@@ -1,0 +1,84 @@
+{
+  "name": "enterprise-ai-dev-skills",
+  "description": "Curated Codex skills for enterprise-grade AI software delivery.",
+  "localSkills": [
+    {
+      "name": "enterprise-ai-dev",
+      "path": "skills/enterprise-ai-dev",
+      "purpose": "Top-level end-to-end workflow for planning, building, verifying, reviewing, and releasing production software."
+    },
+    {
+      "name": "awesome-design-md",
+      "path": "skills/awesome-design-md",
+      "purpose": "Lightweight wrapper for using DESIGN.md references in UI work."
+    }
+  ],
+  "upstreamSkills": [
+    {
+      "repo": "mattpocock/skills",
+      "paths": [
+        "skills/engineering/setup-matt-pocock-skills",
+        "skills/engineering/grill-with-docs",
+        "skills/engineering/to-prd",
+        "skills/engineering/tdd",
+        "skills/engineering/diagnose",
+        "skills/engineering/improve-codebase-architecture",
+        "skills/engineering/zoom-out"
+      ],
+      "purpose": "Requirements alignment, PRD creation, test-driven work, debugging, and architecture improvement."
+    },
+    {
+      "repo": "obra/superpowers",
+      "paths": [
+        "skills/brainstorming",
+        "skills/writing-plans",
+        "skills/test-driven-development",
+        "skills/executing-plans",
+        "skills/systematic-debugging",
+        "skills/requesting-code-review",
+        "skills/verification-before-completion",
+        "skills/finishing-a-development-branch"
+      ],
+      "purpose": "Planning, TDD, systematic debugging, code review, verification, and branch completion."
+    },
+    {
+      "repo": "openai/skills",
+      "paths": [
+        "skills/.curated/security-best-practices",
+        "skills/.curated/security-threat-model"
+      ],
+      "purpose": "Security best practices and threat modeling."
+    },
+    {
+      "repo": "Yeachan-Heo/oh-my-codex",
+      "paths": [
+        "skills/security-review",
+        "skills/frontend-ui-ux",
+        "skills/visual-verdict"
+      ],
+      "purpose": "Security review, UI/UX implementation guidance, and visual QA verdicts."
+    }
+  ],
+  "excludedByDefault": [
+    {
+      "repo": "gsd-build/get-shit-done",
+      "reason": "Powerful but large. Prefer minimal/manual install for users who explicitly want the GSD runtime."
+    },
+    {
+      "repo": "garrytan/gstack",
+      "reason": "Ambitious full workflow stack with runtime assumptions. Prefer official setup instead of copying individual generated skills."
+    },
+    {
+      "repo": "Yeachan-Heo/oh-my-codex",
+      "reason": "Full runtime is primarily tuned for Codex CLI on macOS/Linux; only lightweight skills are included here."
+    },
+    {
+      "repo": "evoiz/Agentic-Design-Patterns",
+      "reason": "Excellent learning reference, not a native Codex skill pack."
+    },
+    {
+      "repo": "karpathy/autoresearch",
+      "reason": "Research automation pattern, not general enterprise app delivery."
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Awesome DESIGN.md"
+  short_description: "Use DESIGN.md references for AI-generated UI style."
+  default_prompt: "Use an appropriate DESIGN.md reference to guide this UI implementation."
