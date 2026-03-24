@@ -28,21 +28,78 @@ The installer can add the following specialist skills globally:
 - Security: `security-review`, `security-best-practices`, `security-threat-model`
 - UI quality: `frontend-ui-ux`, `visual-verdict`, `awesome-design-md`
 
-## Install
+## Install From A Terminal
 
-From a cloned copy of this repo:
+### OpenAI Codex
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'enterprise-ai-dev-bootstrap.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/bootstrap.ps1' -OutFile $p; & $p -Target codex"
 ```
-
-Or on macOS/Linux:
 
 ```bash
-bash scripts/install.sh
+curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/bootstrap.sh | bash -s -- --target codex
 ```
 
-Restart Codex after installing skills.
+### Claude Code
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'enterprise-ai-dev-bootstrap.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/bootstrap.ps1' -OutFile $p; & $p -Target claude"
+```
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/bootstrap.sh | bash -s -- --target claude
+```
+
+### Cursor And Google Antigravity
+
+Cursor and Google Antigravity skill discovery is less standardized than Codex and Claude Code. The installer supports the common directories below, but verify inside the target agent after installing.
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'enterprise-ai-dev-bootstrap.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/bootstrap.ps1' -OutFile $p; & $p -Target cursor"
+```
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'enterprise-ai-dev-bootstrap.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/bootstrap.ps1' -OutFile $p; & $p -Target antigravity"
+```
+
+### Install Everywhere
+
+This writes skills to Codex, Claude Code, Cursor, and Antigravity skill directories. Use this only if you actually use multiple agents.
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'enterprise-ai-dev-bootstrap.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/bootstrap.ps1' -OutFile $p; & $p -Target all"
+```
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/bootstrap.sh | bash -s -- --target all
+```
+
+Restart your AI coding agent after installing skills.
+
+## Install Targets
+
+| Target | Install directory | Confidence |
+| --- | --- | --- |
+| `codex` | `$CODEX_HOME/skills` or `~/.codex/skills` | Proven |
+| `claude` | `~/.claude/skills` | Proven |
+| `cursor` | `~/.cursor/skills` | Experimental |
+| `antigravity` | `~/.gemini/antigravity/skills` | Experimental |
+
+## Verify Installation
+
+Ask your agent:
+
+```text
+List installed skills related to enterprise-ai-dev and explain when you would use them.
+```
+
+Then try:
+
+```text
+Use enterprise-ai-dev to plan a small production-ready feature.
+```
+
+If the agent does not see the skill, restart the app. If it still does not see it, install only to the project-local skills directory supported by that agent.
 
 ## Design Philosophy
 
@@ -51,6 +108,7 @@ Restart Codex after installing skills.
 - Prefer boring, proven engineering practices over framework theater.
 - Prefer evidence: tests, builds, screenshots, logs, diffs, and reproducible commands.
 - Treat autonomous agents as useful only after requirements and verification are clear.
+- Treat remote one-line installers as code execution. Read the scripts first if you are installing on a sensitive machine.
 
 ## Suggested First Use
 
@@ -64,6 +122,24 @@ For an existing repo, first run:
 
 ```text
 Use setup-matt-pocock-skills for this repo, then use enterprise-ai-dev.
+```
+
+## Local Clone Install
+
+If you prefer to inspect before installing:
+
+```bash
+git clone https://github.com/mithunyc/enterprise-ai-dev-skills.git
+cd enterprise-ai-dev-skills
+bash scripts/install.sh --target codex
+```
+
+On Windows:
+
+```powershell
+git clone https://github.com/mithunyc/enterprise-ai-dev-skills.git
+cd enterprise-ai-dev-skills
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Target codex
 ```
 
 ## License

@@ -1,14 +1,45 @@
 param(
+  [ValidateSet("codex", "claude", "cursor", "antigravity", "all")]
+  [string[]]$Target = @("codex"),
   [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
 
-function Resolve-CodexSkillsDir {
-  if ($env:CODEX_HOME) {
-    return Join-Path $env:CODEX_HOME "skills"
+function Resolve-SkillsDirs {
+  param([string[]]$Targets)
+
+  $expanded = @()
+  foreach ($target in $Targets) {
+    if ($target -eq "all") {
+      $expanded += @("codex", "claude", "cursor", "antigravity")
+    } else {
+      $expanded += $target
+    }
   }
-  return Join-Path $HOME ".codex\skills"
+
+  $dirs = @()
+  foreach ($target in ($expanded | Select-Object -Unique)) {
+    switch ($target) {
+      "codex" {
+        if ($env:CODEX_HOME) {
+          $dirs += [pscustomobject]@{ Target = "codex"; Path = (Join-Path $env:CODEX_HOME "skills"); Tier = "proven" }
+        } else {
+          $dirs += [pscustomobject]@{ Target = "codex"; Path = (Join-Path $HOME ".codex\skills"); Tier = "proven" }
+        }
+      }
+      "claude" {
+        $dirs += [pscustomobject]@{ Target = "claude"; Path = (Join-Path $HOME ".claude\skills"); Tier = "proven" }
+      }
+      "cursor" {
+        $dirs += [pscustomobject]@{ Target = "cursor"; Path = (Join-Path $HOME ".cursor\skills"); Tier = "experimental" }
+      }
+      "antigravity" {
+        $dirs += [pscustomobject]@{ Target = "antigravity"; Path = (Join-Path $HOME ".gemini\antigravity\skills"); Tier = "experimental" }
+      }
+    }
+  }
+  return $dirs
 }
 
 function Copy-Skill {
@@ -57,7 +88,7 @@ function Install-FromRepo {
     foreach ($path in $Paths) {
       $source = Join-Path $temp $path
       if (-not (Test-Path $source)) {
-        throw "Path not found in $Repo: $path"
+        throw "Path not found in ${Repo}: $path"
       }
       $name = Split-Path $path -Leaf
       Copy-Skill -Source $source -Name $name -DestRoot $DestRoot
@@ -69,13 +100,27 @@ function Install-FromRepo {
 }
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
-$destRoot = Resolve-CodexSkillsDir
-New-Item -ItemType Directory -Force -Path $destRoot | Out-Null
+$destRoots = Resolve-SkillsDirs $Target
 
-Copy-Skill -Source (Join-Path $repoRoot "skills\enterprise-ai-dev") -Name "enterprise-ai-dev" -DestRoot $destRoot
-Copy-Skill -Source (Join-Path $repoRoot "skills\awesome-design-md") -Name "awesome-design-md" -DestRoot $destRoot
+foreach ($dest in $destRoots) {
+  if ($dest.Tier -eq "experimental") {
+    Write-Host "NOTE: $($dest.Target) support is experimental; verify your agent loads SKILL.md from $($dest.Path)."
+  }
+  New-Item -ItemType Directory -Force -Path $dest.Path | Out-Null
+}
 
-Install-FromRepo -Repo "mattpocock/skills" -DestRoot $destRoot -Paths @(
+foreach ($dest in $destRoots) {
+  Write-Host ""
+  Write-Host "Installing local skills for $($dest.Target) -> $($dest.Path)"
+  Copy-Skill -Source (Join-Path $repoRoot "skills\enterprise-ai-dev") -Name "enterprise-ai-dev" -DestRoot $dest.Path
+  Copy-Skill -Source (Join-Path $repoRoot "skills\awesome-design-md") -Name "awesome-design-md" -DestRoot $dest.Path
+}
+
+foreach ($dest in $destRoots) {
+  Write-Host ""
+  Write-Host "Installing upstream skills for $($dest.Target)"
+
+Install-FromRepo -Repo "mattpocock/skills" -DestRoot $dest.Path -Paths @(
   "skills/engineering/setup-matt-pocock-skills",
   "skills/engineering/grill-with-docs",
   "skills/engineering/to-prd",
@@ -85,7 +130,7 @@ Install-FromRepo -Repo "mattpocock/skills" -DestRoot $destRoot -Paths @(
   "skills/engineering/zoom-out"
 )
 
-Install-FromRepo -Repo "obra/superpowers" -DestRoot $destRoot -Paths @(
+Install-FromRepo -Repo "obra/superpowers" -DestRoot $dest.Path -Paths @(
   "skills/brainstorming",
   "skills/writing-plans",
   "skills/test-driven-development",
@@ -96,16 +141,17 @@ Install-FromRepo -Repo "obra/superpowers" -DestRoot $destRoot -Paths @(
   "skills/finishing-a-development-branch"
 )
 
-Install-FromRepo -Repo "openai/skills" -DestRoot $destRoot -Paths @(
+Install-FromRepo -Repo "openai/skills" -DestRoot $dest.Path -Paths @(
   "skills/.curated/security-best-practices",
   "skills/.curated/security-threat-model"
 )
 
-Install-FromRepo -Repo "Yeachan-Heo/oh-my-codex" -DestRoot $destRoot -Paths @(
+Install-FromRepo -Repo "Yeachan-Heo/oh-my-codex" -DestRoot $dest.Path -Paths @(
   "skills/security-review",
   "skills/frontend-ui-ux",
   "skills/visual-verdict"
 )
+}
 
 Write-Host ""
-Write-Host "Done. Restart Codex to pick up new skills."
+Write-Host "Done. Restart your AI coding agent to pick up new skills."
