@@ -1,94 +1,135 @@
 param(
   [ValidateSet("codex", "claude", "cursor", "antigravity", "all")]
   [string[]]$Target = @("codex"),
-  [switch]$Force
+
+  [ValidateSet("minimal", "core", "full", "contributor")]
+  [string]$Mode = "core",
+
+  [switch]$Force,
+  [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
 
+# ── Skill lists per mode ────────────────────────────────────────────────────
+$LocalSkillsByMode = @{
+  minimal     = @("enterprise-ai-dev", "karpathy-guidelines")
+  core        = @("enterprise-ai-dev", "karpathy-guidelines", "awesome-design-md", "caveman")
+  full        = @("enterprise-ai-dev", "karpathy-guidelines", "awesome-design-md", "caveman", "grill-me")
+  contributor = @()  # Not auto-installed; see CONTRIBUTING.md
+}
+
+$UpstreamByMode = @{
+  minimal = @{
+    "mattpocock/skills" = @("skills/engineering/tdd", "skills/engineering/diagnose")
+    "obra/superpowers"  = @("skills/brainstorming")
+  }
+  core = @{
+    "mattpocock/skills" = @(
+      "skills/engineering/tdd", "skills/engineering/diagnose",
+      "skills/engineering/grill-with-docs", "skills/engineering/to-prd"
+    )
+    "obra/superpowers"  = @(
+      "skills/brainstorming", "skills/writing-plans", "skills/executing-plans",
+      "skills/verification-before-completion"
+    )
+    "openai/skills"     = @("skills/.curated/security-best-practices")
+  }
+  full = @{
+    "mattpocock/skills" = @(
+      "skills/engineering/tdd", "skills/engineering/diagnose",
+      "skills/engineering/grill-with-docs", "skills/engineering/to-prd",
+      "skills/engineering/improve-codebase-architecture", "skills/engineering/zoom-out",
+      "skills/engineering/setup-matt-pocock-skills"
+    )
+    "obra/superpowers"  = @(
+      "skills/brainstorming", "skills/writing-plans", "skills/executing-plans",
+      "skills/verification-before-completion", "skills/requesting-code-review",
+      "skills/finishing-a-development-branch"
+    )
+    "openai/skills"     = @("skills/.curated/security-best-practices", "skills/.curated/security-threat-model")
+  }
+  contributor = @{}
+}
+
+# ── Target resolution ───────────────────────────────────────────────────────
 function Resolve-SkillsDirs {
   param([string[]]$Targets)
-
   $expanded = @()
-  foreach ($target in $Targets) {
-    if ($target -eq "all") {
-      $expanded += @("codex", "claude", "cursor", "antigravity")
-    } else {
-      $expanded += $target
-    }
+  foreach ($t in $Targets) {
+    if ($t -eq "all") { $expanded += @("codex", "claude", "cursor", "antigravity") }
+    else              { $expanded += $t }
   }
-
   $dirs = @()
-  foreach ($target in ($expanded | Select-Object -Unique)) {
-    switch ($target) {
-      "codex" {
-        if ($env:CODEX_HOME) {
-          $dirs += [pscustomobject]@{ Target = "codex"; Path = (Join-Path $env:CODEX_HOME "skills"); Tier = "proven" }
-        } else {
-          $dirs += [pscustomobject]@{ Target = "codex"; Path = (Join-Path $HOME ".codex\skills"); Tier = "proven" }
-        }
-      }
-      "claude" {
-        $dirs += [pscustomobject]@{ Target = "claude"; Path = (Join-Path $HOME ".claude\skills"); Tier = "proven" }
-      }
-      "cursor" {
-        $dirs += [pscustomobject]@{ Target = "cursor"; Path = (Join-Path $HOME ".cursor\skills"); Tier = "experimental" }
-      }
-      "antigravity" {
-        $dirs += [pscustomobject]@{ Target = "antigravity"; Path = (Join-Path $HOME ".gemini\antigravity\skills"); Tier = "experimental" }
-      }
+  foreach ($t in ($expanded | Select-Object -Unique)) {
+    switch ($t) {
+      "codex"       { $dirs += [pscustomobject]@{ Target=$t; Path=if($env:CODEX_HOME){Join-Path $env:CODEX_HOME "skills"}else{Join-Path $HOME ".codex\skills"} } }
+      "claude"      { $dirs += [pscustomobject]@{ Target=$t; Path=Join-Path $HOME ".claude\skills" } }
+      "cursor"      { $dirs += [pscustomobject]@{ Target=$t; Path=Join-Path $HOME ".cursor\skills" } }
+      "antigravity" { $dirs += [pscustomobject]@{ Target=$t; Path=Join-Path $HOME ".gemini\antigravity\skills" } }
     }
   }
   return $dirs
 }
 
-function Copy-Skill {
-  param(
-    [string]$Source,
-    [string]$Name,
-    [string]$DestRoot
-  )
+# ── Conflict detection ──────────────────────────────────────────────────────
+function Get-ConflictReport {
+  param([string]$DestRoot, [string[]]$IncomingSkills)
+  $conflicts = @()
+  foreach ($skill in $IncomingSkills) {
+    $dest = Join-Path $DestRoot $skill
+    if (Test-Path $dest) {
+      $conflicts += $skill
+    }
+  }
+  return $conflicts
+}
 
+function Get-GovernanceConflicts {
+  param([string]$ProjectRoot)
+  $found = @()
+  $checks = @("AGENTS.md", "CLAUDE.md", ".cursorrules", "tasks/STATE.md")
+  foreach ($f in $checks) {
+    if (Test-Path (Join-Path $ProjectRoot $f)) { $found += $f }
+  }
+  return $found
+}
+
+# ── Copy helpers ────────────────────────────────────────────────────────────
+function Copy-Skill {
+  param([string]$Source, [string]$Name, [string]$DestRoot)
   $dest = Join-Path $DestRoot $Name
   if ((Test-Path $dest) -and -not $Force) {
-    Write-Host "skip $Name (already installed; use -Force to overwrite)"
+    Write-Host "  skip  $Name (exists; use -Force to overwrite)"
     return
   }
-  if (Test-Path $dest) {
-    Remove-Item -Recurse -Force -LiteralPath $dest
-  }
+  if ($DryRun) { Write-Host "  dry   $Name -> $dest"; return }
+  if (Test-Path $dest) { Remove-Item -Recurse -Force -LiteralPath $dest }
   Copy-Item -Recurse -Force -LiteralPath $Source -Destination $dest
   Normalize-Skill $dest
-  Write-Host "installed $Name"
+  Write-Host "  added $Name"
 }
 
 function Normalize-Skill {
   param([string]$SkillPath)
-
-  $skillMd = Join-Path $SkillPath "SKILL.md"
-  if (-not (Test-Path $skillMd)) {
-    throw "Missing SKILL.md in $SkillPath"
-  }
-
-  $content = Get-Content -Raw -LiteralPath $skillMd
+  $md = Join-Path $SkillPath "SKILL.md"
+  if (-not (Test-Path $md)) { throw "Missing SKILL.md in $SkillPath" }
+  $content = Get-Content -Raw -LiteralPath $md
   $content = $content -replace "(?m)^disable-model-invocation:\s*true\r?\n", ""
-  Set-Content -NoNewline -Encoding UTF8 -LiteralPath $skillMd -Value $content
+  Set-Content -NoNewline -Encoding UTF8 -LiteralPath $md -Value $content
 }
 
 function Install-FromRepo {
-  param(
-    [string]$Repo,
-    [string[]]$Paths,
-    [string]$DestRoot
-  )
-
-  $temp = Join-Path ([System.IO.Path]::GetTempPath()) ("enterprise-ai-dev-skills-" + [Guid]::NewGuid().ToString("N"))
-  git clone --depth 1 "https://github.com/$Repo.git" $temp | Out-Host
+  param([string]$Repo, [string[]]$Paths, [string]$DestRoot)
+  $temp = Join-Path ([System.IO.Path]::GetTempPath()) ("ead-skills-" + [Guid]::NewGuid().ToString("N"))
+  Write-Host "  cloning $Repo..."
+  git clone --depth 1 "https://github.com/$Repo.git" $temp 2>&1 | Out-Null
   try {
     foreach ($path in $Paths) {
       $source = Join-Path $temp $path
       if (-not (Test-Path $source)) {
-        throw "Path not found in ${Repo}: $path"
+        Write-Warning "  Path not found in ${Repo}: $path — skipping"
+        continue
       }
       $name = Split-Path $path -Leaf
       Copy-Skill -Source $source -Name $name -DestRoot $DestRoot
@@ -99,59 +140,54 @@ function Install-FromRepo {
   }
 }
 
-$repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
+# ── Main ────────────────────────────────────────────────────────────────────
+$repoRoot  = Resolve-Path (Join-Path $PSScriptRoot "..")
 $destRoots = Resolve-SkillsDirs $Target
 
-foreach ($dest in $destRoots) {
-  if ($dest.Tier -eq "experimental") {
-    Write-Host "NOTE: $($dest.Target) support is experimental; verify your agent loads SKILL.md from $($dest.Path)."
-  }
-  New-Item -ItemType Directory -Force -Path $dest.Path | Out-Null
-}
-
-foreach ($dest in $destRoots) {
-  Write-Host ""
-  Write-Host "Installing local skills for $($dest.Target) -> $($dest.Path)"
-  Copy-Skill -Source (Join-Path $repoRoot "skills\enterprise-ai-dev") -Name "enterprise-ai-dev" -DestRoot $dest.Path
-  Copy-Skill -Source (Join-Path $repoRoot "skills\awesome-design-md") -Name "awesome-design-md" -DestRoot $dest.Path
-}
-
-foreach ($dest in $destRoots) {
-  Write-Host ""
-  Write-Host "Installing upstream skills for $($dest.Target)"
-
-Install-FromRepo -Repo "mattpocock/skills" -DestRoot $dest.Path -Paths @(
-  "skills/engineering/setup-matt-pocock-skills",
-  "skills/engineering/grill-with-docs",
-  "skills/engineering/to-prd",
-  "skills/engineering/tdd",
-  "skills/engineering/diagnose",
-  "skills/engineering/improve-codebase-architecture",
-  "skills/engineering/zoom-out"
-)
-
-Install-FromRepo -Repo "obra/superpowers" -DestRoot $dest.Path -Paths @(
-  "skills/brainstorming",
-  "skills/writing-plans",
-  "skills/test-driven-development",
-  "skills/executing-plans",
-  "skills/systematic-debugging",
-  "skills/requesting-code-review",
-  "skills/verification-before-completion",
-  "skills/finishing-a-development-branch"
-)
-
-Install-FromRepo -Repo "openai/skills" -DestRoot $dest.Path -Paths @(
-  "skills/.curated/security-best-practices",
-  "skills/.curated/security-threat-model"
-)
-
-Install-FromRepo -Repo "Yeachan-Heo/oh-my-codex" -DestRoot $dest.Path -Paths @(
-  "skills/security-review",
-  "skills/frontend-ui-ux",
-  "skills/visual-verdict"
-)
-}
-
 Write-Host ""
+Write-Host "enterprise-ai-dev-skills installer"
+Write-Host "  Mode   : $Mode"
+Write-Host "  Target : $($Target -join ', ')"
+if ($DryRun) { Write-Host "  DRY RUN — no files will be written" }
+Write-Host ""
+
+foreach ($dest in $destRoots) {
+  New-Item -ItemType Directory -Force -Path $dest.Path | Out-Null
+
+  # ── Conflict report ──────────────────────────────────────────────────────
+  $allSkillNames = $LocalSkillsByMode[$Mode] + ($UpstreamByMode[$Mode].Values | ForEach-Object { $_ | ForEach-Object { Split-Path $_ -Leaf } })
+  $skillConflicts = Get-ConflictReport -DestRoot $dest.Path -IncomingSkills $allSkillNames
+  if ($skillConflicts.Count -gt 0) {
+    Write-Host "CONFLICT REPORT for $($dest.Target):"
+    foreach ($c in $skillConflicts) { Write-Host "  - $c already installed (will skip unless -Force)" }
+    Write-Host ""
+  }
+
+  # ── Local skills ─────────────────────────────────────────────────────────
+  Write-Host "[$($dest.Target)] Installing local skills ($Mode mode)..."
+  foreach ($skillName in $LocalSkillsByMode[$Mode]) {
+    $source = Join-Path $repoRoot "skills\$skillName"
+    if (-not (Test-Path $source)) {
+      Write-Warning "  Local skill not found: $skillName — skipping"
+      continue
+    }
+    Copy-Skill -Source $source -Name $skillName -DestRoot $dest.Path
+  }
+
+  # ── Upstream skills ──────────────────────────────────────────────────────
+  Write-Host ""
+  Write-Host "[$($dest.Target)] Installing upstream skills ($Mode mode)..."
+  foreach ($repo in $UpstreamByMode[$Mode].Keys) {
+    $paths = $UpstreamByMode[$Mode][$repo]
+    if ($paths.Count -gt 0) {
+      Install-FromRepo -Repo $repo -Paths $paths -DestRoot $dest.Path
+    }
+  }
+
+  Write-Host ""
+}
+
 Write-Host "Done. Restart your AI coding agent to pick up new skills."
+Write-Host ""
+Write-Host "Install modes available: minimal | core (default) | full | contributor"
+Write-Host "Usage: .\scripts\install.ps1 -Target antigravity -Mode full"

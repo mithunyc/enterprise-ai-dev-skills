@@ -1,120 +1,191 @@
 ---
 name: enterprise-ai-dev
-description: End-to-end enterprise-grade AI software delivery workflow for nontechnical founders, product owners, and teams using Codex to build production software. Use when asked to build, fix, refactor, launch, review, harden, or operate software with AI agents, especially when the request mentions enterprise-grade, production-ready, robust, secure, scalable, full-stack, end-to-end, autonomous agent development, PRD, tickets, tests, deployment, QA, security, or release readiness.
+description: >
+  End-to-end enterprise-grade AI software delivery workflow. The master
+  orchestrator for spec-to-production development. Use when asked to build,
+  fix, refactor, launch, review, harden, or operate software — especially when
+  the request involves: enterprise-grade, production-ready, brownfield project,
+  new project, PRD, architecture, TDD, QA, security, deployment, or release.
+  Automatically selects GREENFIELD, BROWNFIELD, or AUTONOMOUS profile.
 ---
 
-# Enterprise AI Dev
-
-Use this skill as the operating workflow for serious software work. Be adversarial, evidence-led, and user-friendly. The user may be nontechnical, so translate decisions into business and product consequences without hiding engineering risks.
+# Enterprise AI Dev — Spec-to-Production Control Plane
 
 ## Prime Directive
 
-Ship the smallest production-grade slice that proves the product value, with tests, security review, observability, and rollback thinking. Do not optimize for impressive activity. Optimize for verified outcomes.
+Ship the smallest production-grade vertical slice that proves product value, with tests, security review, and rollback thinking. Optimize for **verified outcomes**, not impressive activity.
 
-## Source Of Truth
+---
 
-Before implementation, establish or update these artifacts when they are missing or stale:
+## Step 0: Classify and Select Profile
 
-- `PRD.md`: goal, users, must-haves, non-goals, acceptance criteria.
-- `CONTEXT.md`: domain terms, business rules, integration boundaries, user language.
-- `docs/adr/`: architecture decisions that would be expensive to reverse.
-- Issue list or task plan: independently testable vertical slices.
+Before anything else, classify the project:
 
-If the repository already has equivalent files, use its existing names and conventions.
+| Signal | Classification |
+|--------|---------------|
+| Empty or near-empty directory | GREENFIELD |
+| Existing files + git history | BROWNFIELD |
+| Steps 0–8 already approved, looping on stories | AUTONOMOUS |
 
-## Workflow
+---
 
-1. Clarify the outcome.
-   - Ask only the questions that materially affect architecture, risk, cost, or UX.
-   - Prefer assumptions with explicit confidence when the answer can be safely inferred.
-   - State non-goals early to prevent scope creep.
+## GREENFIELD Path
 
-2. Stress-test the request.
-   - Challenge the user framing: is this feature, workflow, or product actually the narrowest useful slice?
-   - Identify failure modes: wrong user, wrong data model, wrong integration, hidden compliance, weak auth, operational cost, lock-in, bad UX, hard rollback.
-   - Give a plain-language recommendation with tradeoffs.
+Steps: `0 → 1A → 2 → 3 → 4 → 7 → 8 → 9 → 11 → 14`
 
-3. Plan vertical slices.
-   - Break work into small slices that each produce observable user value.
-   - Each slice must include implementation, tests, docs if relevant, and verification.
-   - Avoid platform migrations, large rewrites, and speculative abstractions unless they directly reduce current risk.
+**Rule:** Build first, govern after proof. Do NOT front-load ceremony.
 
-4. Implement with guardrails.
-   - Read the existing codebase first and follow local patterns.
-   - Keep edits scoped to the slice.
-   - Write or update tests before or alongside behavior changes.
-   - Prefer boring, widely adopted dependencies over novel frameworks.
-   - Do not invent secrets, fake production credentials, or silent fallback behavior.
+1. **Step 1A — Minimal audit:** `git status`, branch, runtime, package manager, existing files.
+2. **Step 2 — PRD:** Clarify outcome. Ask only questions that affect architecture, risk, or UX.
+3. **Step 3 — Adversarial Spec:** Apply grill-me to the PRD. Risk-scaled probe count (see below).
+4. **Step 4 — Architecture Checkpoint:** Simplest version that works. Karpathy check: "Would a senior engineer say this is overcomplicated?"
+5. **Step 7 — Slice Contract:** Define `allowed_files`, `blast_radius`, `evidence_required`.
+6. **Step 8 — Human Approval (Planning Gate):** Present DECISION REQUIRED block. Wait for approval.
+7. **Steps 9–11 — Build, self-review, deterministic gates.**
+8. **Step 14 — PR / Preview.**
 
-5. Verify with evidence.
-   - Run the repository's relevant tests, type checks, lint, build, and migrations where applicable.
-   - For frontend work, test real flows in a browser and inspect responsive states.
-   - For APIs, verify success, failure, auth, validation, and idempotency paths.
-   - Never claim completion without saying what was verified and what was not.
+---
 
-6. Review adversarially.
-   - Review the diff for security, data loss, race conditions, privacy, permissions, error handling, observability, and rollback.
-   - Check docs and user-facing text for drift.
-   - Revisit the PRD acceptance criteria and mark each as pass, fail, or not tested.
+## BROWNFIELD Path
 
-7. Prepare release.
-   - Summarize user impact, changed files, tests run, residual risk, deploy steps, rollback plan, and follow-up work.
-   - Prefer a pull request or reviewed merge over direct production changes.
-   - For high-risk changes, recommend feature flags, canaries, monitoring, and a manual rollback path.
+Steps: `0 → 1A → 1B → [STABILIZE if needed] → 2 → full lifecycle`
 
-## Quality Gates
+**Rule:** Never build on a broken foundation. Diagnose before building.
 
-Do not recommend shipping until these are true or explicitly waived:
+### Step 1A — Minimal Audit (all brownfield)
+- `git status`, branch, file count, package manager, runtime
+- Check for: `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, CI config, existing skills
 
-- Acceptance criteria are mapped to concrete verification.
-- Tests cover the changed behavior and at least one important failure path.
-- Security-sensitive flows have auth, authorization, validation, and audit/logging considered.
-- Data model changes include migration and rollback thinking.
-- User-visible UI has been visually checked at desktop and mobile sizes.
-- Operational paths include errors, retries, observability, and cost limits where relevant.
-- No unrelated drive-by changes are mixed into the diff.
+### Step 1B — Full Diagnostic
+Run the repo's native checks:
+```
+lint / typecheck / test / build
+```
+Produce `diagnostic_baseline.md` with frontmatter:
+```yaml
+---
+type: diagnostic_baseline
+repo_state: B | C | D
+health:
+  build: PASS | FAIL | NOT_CONFIGURED
+  tests: PASS | FAIL | NONE
+  lint: PASS | FAIL | NOT_CONFIGURED
+  ci: CONFIGURED | NONE
+stabilization_required: true | false
+---
+```
+
+### Stabilization Gate
+If `stabilization_required: true`:
+- Present stabilization plan (minimum changes to unblock features)
+- **BLOCK feature work until human approves and foundation is verified**
+- If repo healthy → generate `.buildloop.yml` → proceed to Step 2
+
+### Brownfield Non-Negotiables
+
+| Existing | Do | Never |
+|----------|-----|-------|
+| AGENTS.md | Read. Suggest improvements. | Overwrite. |
+| CLAUDE.md | Add skill routing only if missing. | Replace. |
+| CI / Makefile | Respect it. .buildloop.yml adapts. | Replace. |
+| Task tracker | Use existing (Issues/Jira). | Force prd.json. |
+| Skills | Deduplicate. Skip overlap. | Install duplicates. |
+| Test framework | Run existing. | Replace framework. |
+
+---
+
+## AUTONOMOUS Path
+
+**Prerequisite:** Steps 0–8 must be **fully approved** before this path runs.
+
+Loop: `9 (TDD) → 10 (self-review) → 11 (gates) → 12 (AI review) → receipt → commit → next approved slice`
+
+Autonomous mode reads `.buildloop.yml` for commands and `protected_paths`. If stuck (3+ consecutive failures): emit STUCK signal, escalate to human.
+
+---
+
+## Risk-Scaled Grill-Me Probes
+
+Apply when stress-testing PRD, architecture, or slice contract:
+
+| Risk Level | Probe Count |
+|-----------|-------------|
+| Low (cosmetic / additive) | 1–2 probes |
+| Medium (new feature, integration) | 3 probes |
+| High (auth, schema, billing, external API) | 5–7 probes |
+
+**Never exceed 7 probes unless human asks.** Each probe: Q + recommended A. Human approves/modifies/rejects.
+
+---
+
+## Gate Format (Required at Every Human Checkpoint)
+
+```
+DECISION REQUIRED
+Recommendation: PROCEED / FIX / HALT
+Why: [1–2 sentences, plain language]
+Risk: LOW / MEDIUM / HIGH
+What I need from you: approve / modify / reject
+If approved, next action: [explicit next step]
+```
+
+---
+
+## Deterministic Gates (Step 11)
+
+Gate-runner reads `.buildloop.yml`:
+```yaml
+adoption_mode: greenfield | brownfield | autonomous
+risk_level: low | medium | high
+commands:
+  lint: "[your lint command]"
+  typecheck: "[your typecheck command]"
+  test: "[your test command]"
+  build: "[your build command]"
+protected_paths:
+  - ".env*"
+  - "**/*.key"
+  - ".github/workflows/**"
+```
+
+Gate-runner produces `gate-results.json`. Evidence receipt references it. Gate-runner is the independent witness — the agent does not self-grade.
+
+---
 
 ## Skill Routing
 
-Use specialist skills when available:
+| Need | Skill |
+|------|-------|
+| Plan stress-test | `grill-me` |
+| Token compression | `caveman` |
+| Anti-overcomplication | `karpathy-guidelines` |
+| Requirements / PRD | `grill-with-docs`, `to-prd`, `brainstorming` |
+| TDD | `tdd`, `writing-plans`, `executing-plans` |
+| Debugging | `diagnose` |
+| Architecture review | `improve-codebase-architecture`, `zoom-out` |
+| Code review / release | `requesting-code-review`, `verification-before-completion`, `finishing-a-development-branch` |
+| Security | `security-best-practices`, `security-threat-model` |
+| UI design | `awesome-design-md` |
+| Issue triage | `triage` |
 
-- Requirements and alignment: `grill-with-docs`, `to-prd`, `brainstorming`, `writing-plans`.
-- Implementation discipline: `tdd`, `test-driven-development`, `executing-plans`.
-- Debugging: `diagnose`, `systematic-debugging`.
-- Architecture cleanup: `improve-codebase-architecture`, `zoom-out`.
-- Review and release: `requesting-code-review`, `verification-before-completion`, `finishing-a-development-branch`.
-- Security: `security-review`, `security-best-practices`, `security-threat-model`.
-- UI quality: `frontend-ui-ux`, `visual-verdict`, `awesome-design-md` references, or a project `DESIGN.md`.
+---
 
-If a specialist skill is heavy, experimental, unavailable, or mismatched to the environment, follow the equivalent workflow manually instead of forcing the tool.
+## Quality Gates (Do Not Ship Without These)
 
-## Contrarian Defaults
+- [ ] Acceptance criteria mapped to concrete verification
+- [ ] Tests cover changed behavior + at least one failure path
+- [ ] Security-sensitive flows: auth, authorization, validation considered
+- [ ] Data changes: migration and rollback path verified
+- [ ] No unrelated drive-by changes in the diff
+- [ ] `gate-results.json` exists and shows PASS
 
-- Prefer fewer installed skills over a huge prompt surface.
-- Prefer one accountable agent flow over many parallel agents until the plan is decomposed cleanly.
-- Prefer evidence over vibes: logs, tests, screenshots, diffs, traces, and reproducible commands.
-- Prefer boring stacks: TypeScript, Python, Go, Postgres, Redis, standard cloud primitives, and managed auth unless the repo dictates otherwise.
-- Prefer buying commodity infrastructure and building only the product-specific differentiator.
-- Treat autonomous execution as a privilege earned by clear plans and strong verification.
-
-## Nontechnical User Communication
-
-Use short decision briefs:
-
-```text
-Recommendation: <what to do>
-Why it matters: <user/business impact>
-Tradeoff: <cost/risk/complexity>
-Verification: <how we will know it works>
-```
-
-Avoid unexplained jargon. When jargon is necessary, define it in one sentence and keep moving.
+---
 
 ## Stop Conditions
 
 Pause and ask before:
-
-- Deleting data, rewriting history, force-pushing, rotating production credentials, or changing billing-critical logic.
-- Installing large workflow frameworks or persistent agent runtimes.
-- Making irreversible architecture choices when the business requirement is still unclear.
-- Proceeding when tests cannot run and the change is high-risk.
+- Deleting data, force-pushing, rotating production credentials
+- Touching `protected_paths` from `.buildloop.yml`
+- Making irreversible architecture choices when requirement is unclear
+- Proceeding when tests cannot run and change is high-risk
+- Taking any action at L4+ autonomy level without explicit opt-in
