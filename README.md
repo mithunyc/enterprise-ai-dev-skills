@@ -12,10 +12,10 @@ Curated skills, templates, schemas, and gate scripts that give AI coding agents 
 
 ## Who This Is For
 
-- **Nontechnical founders** who want AI agents to build software without losing control.
-- **Product owners** who need PRDs, scope control, and release readiness.
-- **Developers** who want stricter testing, debugging, review, and security workflows.
-- **Teams** who want AI agents to follow evidence-based delivery instead of open-ended vibe coding.
+- **Founders:** Build software with AI without losing control of the architecture.
+- **Product Owners:** Enforce PRDs, scope boundaries, and release readiness.
+- **Developers:** Adopt stricter testing, debugging, and security workflows.
+- **Engineering Teams:** Replace open-ended vibe coding with deterministic, evidence-based delivery.
 
 ---
 
