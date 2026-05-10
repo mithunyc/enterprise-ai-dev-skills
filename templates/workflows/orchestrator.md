@@ -1,3 +1,9 @@
+---
+type: workflow
+name: orchestrator
+description: Thin workflow shim for invoking the enterprise-ai-dev master orchestrator skill.
+---
+
 # Orchestrator
 
 Invoke the enterprise-ai-dev skill as the master orchestrator for this project.

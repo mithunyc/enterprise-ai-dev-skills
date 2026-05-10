@@ -1,0 +1,177 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-templates:
+    name: Validate template frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Parse template YAML frontmatter
+        run: |
+          node --input-type=module <<'NODE'
+          import { readdirSync, readFileSync, statSync } from 'node:fs';
+          import { join, relative } from 'node:path';
+
+          const templateRoot = 'templates';
+          const files = [];
+
+          function walk(dir) {
+            for (const entry of readdirSync(dir)) {
+              const path = join(dir, entry);
+              if (statSync(path).isDirectory()) {
+                walk(path);
+              } else {
+                files.push(path);
+              }
+            }
+          }
+
+          function validateFrontmatter(path) {
+            const raw = readFileSync(path, 'utf8');
+            if (!raw.startsWith('---\n') && !raw.startsWith('---\r\n')) {
+              return false;
+            }
+
+            const lines = raw.split(/\r?\n/);
+            const end = lines.findIndex((line, index) => index > 0 && line === '---');
+            if (end === -1) {
+              throw new Error(`${path}: opening frontmatter delimiter has no closing delimiter`);
+            }
+
+            const block = lines.slice(1, end);
+            let topLevelKeys = 0;
+
+            for (const [index, line] of block.entries()) {
+              const trimmed = line.trim();
+              if (trimmed === '' || trimmed.startsWith('#')) continue;
+              if (/^[A-Za-z_][A-Za-z0-9_-]*\s*:/.test(line)) {
+                topLevelKeys += 1;
+                continue;
+              }
+              if (/^\s{2,}-\s+\S/.test(line)) continue;
+              if (/^\s{2,}[A-Za-z_][A-Za-z0-9_-]*\s*:/.test(line)) continue;
+              throw new Error(`${path}:${index + 2}: unsupported frontmatter line: ${line}`);
+            }
+
+            if (topLevelKeys === 0) {
+              throw new Error(`${path}: frontmatter has no top-level keys`);
+            }
+
+            return true;
+          }
+
+          walk(templateRoot);
+
+          let parsed = 0;
+          for (const file of files) {
+            if (validateFrontmatter(file)) {
+              parsed += 1;
+              console.log(`parsed ${relative(process.cwd(), file)}`);
+            }
+          }
+
+          if (parsed === 0) {
+            throw new Error('No template frontmatter blocks found');
+          }
+
+          console.log(`Parsed ${parsed} template frontmatter block(s).`);
+          NODE
+
+  validate-schemas:
+    name: Validate schema JSON
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: JSON.parse schemas
+        run: |
+          node --input-type=module <<'NODE'
+          import { readdirSync, readFileSync } from 'node:fs';
+          import { join } from 'node:path';
+
+          const schemaRoot = 'schemas';
+          const files = readdirSync(schemaRoot)
+            .map((file) => join(schemaRoot, file));
+
+          if (files.length === 0) {
+            throw new Error('No schema files found');
+          }
+
+          for (const file of files) {
+            JSON.parse(readFileSync(file, 'utf8'));
+            console.log(`parsed ${file}`);
+          }
+          NODE
+
+  lint-scripts:
+    name: Check script syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: node --check scripts
+        run: |
+          node --input-type=module <<'NODE'
+          import { readdirSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { spawnSync } from 'node:child_process';
+
+          const files = readdirSync('scripts')
+            .filter((file) => file.endsWith('.mjs'))
+            .map((file) => join('scripts', file));
+
+          if (files.length === 0) {
+            throw new Error('No scripts/*.mjs files found');
+          }
+
+          for (const file of files) {
+            console.log(`checking ${file}`);
+            const result = spawnSync(process.execPath, ['--check', file], { stdio: 'inherit' });
+            if (result.status !== 0) {
+              process.exit(result.status ?? 1);
+            }
+          }
+          NODE
+
+  test:
+    name: Run install tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run install test suite
+        run: node tests/install.test.mjs

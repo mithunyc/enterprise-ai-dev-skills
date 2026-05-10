@@ -3,7 +3,7 @@
 **Repo:** enterprise-ai-dev-skills
 **Remote:** https://github.com/mithunyc/enterprise-ai-dev-skills
 **Local:** C:\Users\mshmi\OneDrive\Apps\enterprise-ai-dev-skills
-**Last Updated:** 2026-05-10T07:26:09Z
+**Last Updated:** 2026-05-10T07:45:00Z
 
 ---
 
@@ -13,12 +13,12 @@
 **Phase 1: COMPLETE** - templates, schemas, reference docs, playbooks, and contribution docs exist.
 **Phase 1.5: COMPLETE** - orchestrator hardening and risk matrix work exists.
 **Phase 1.6: COMPLETE** - brownfield bootstrap compiler, manifest schema/example, diagnostic labs, and validator exist.
-**Phase 2: IN PROGRESS** - Tasks 14, 15, and 16 are complete in this workspace; Tasks 17 and 18 are not started here.
+**Phase 2: COMPLETE** - gate scripts, upstream audit, root governance, CI workflow, and install tests are implemented and locally verified.
 **Phase 3: NOT STARTED**
 **Phase 4: NOT STARTED**
 
-Current branch at Task 16 start: `main`
-Latest commit observed at Task 16 start: `c75ed92 docs: update Phase 2 state and enterprise-ai-dev spec`
+Current branch at Phase 2 completion: `main`
+Latest committed baseline before Task 17/18 finalization: `f37e403 docs: add repo agent governance`
 
 ---
 
@@ -36,7 +36,7 @@ Read in this order before conclusions:
 
 ---
 
-## Phase 2 Evidence Through Task 16
+## Phase 2 Evidence
 
 | Task | File(s) | Status | Evidence |
 | --- | --- | --- | --- |
@@ -44,14 +44,8 @@ Read in this order before conclusions:
 | 15 | `scripts/audit-upstream.mjs` | COMPLETE | Present. `node scripts/audit-upstream.mjs` exits 0 and reports all 3 upstream repos `UP_TO_DATE` in this workspace. |
 | 15 | `curated-skills.json`, `scripts/install.ps1`, `scripts/install.sh` | COMPLETE | `curated-skills.json` has three full 40-character pinned SHAs; both installers require full SHA pins and verify detached checkout. |
 | 16 | `AGENTS.md` | COMPLETE | Root governance file created. It references `tasks/STATE.md`, `docs/ROADMAP.md`, `templates/`, and this repo's quality gates. |
-
-Phase 2 work not completed in this workspace:
-
-- Task 17: `.github/workflows/ci.yml`
-- Task 18: `tests/install.test.mjs`
-- Phase 2 final commit
-
-Do not mark Phase 2 complete until Tasks 17 and 18 are implemented and verified.
+| 17 | `.github/workflows/ci.yml` | COMPLETE | CI workflow added for template validation, schema validation, script syntax checks, and `node tests/install.test.mjs`. |
+| 18 | `tests/install.test.mjs`, `templates/workflows/orchestrator.md` | COMPLETE | Install test suite exits 0; workflow template now has required frontmatter. |
 
 ---
 
@@ -65,14 +59,14 @@ Run the gates relevant to the files touched:
 - Installer dry-runs when touching installer scripts
 - `git diff --check -- <touched files>` before handoff
 
-Task 16 verification set:
+Phase 2 final verification set:
 
-- `Test-Path AGENTS.md`
-- `(Get-Item AGENTS.md).Length` must be <= 8192 bytes
-- `Select-String -Path AGENTS.md -Pattern 'tasks/STATE.md','docs/ROADMAP.md','templates/','validate-manifest','audit-upstream','gate-runner'`
+- `node tests/install.test.mjs`
 - `node scripts/validate-manifest.mjs`
 - `node scripts/audit-upstream.mjs`
-- `git diff --check -- AGENTS.md tasks/STATE.md`
+- `node --check` for every `scripts/*.mjs`
+- CI workflow text contract check for `push`, `pull_request`, required jobs, and `node tests/install.test.mjs`
+- `git diff --check -- .github/workflows/ci.yml tests/install.test.mjs templates/workflows/orchestrator.md tasks/STATE.md`
 
 ---
 
@@ -80,9 +74,9 @@ Task 16 verification set:
 
 | Risk | Severity | Current handling |
 | --- | --- | --- |
-| Phase 2 is only partially complete | MEDIUM | Keep status `IN PROGRESS`; do not start Task 17 without instruction. |
 | Root `AGENTS.md` could drift from `templates/AGENTS.template.md` intent | LOW | Keep root file repo-specific and short; use template only for downstream repos. |
 | Upstream repos may move after audit | LOW | `audit-upstream.mjs` is read-only and should be rerun before releases or pin bumps. |
+| GitHub Actions YAML was not parsed with a dedicated local Actions linter | LOW | Workflow structure was text-checked locally; GitHub will validate it on push/PR. |
 
 ---
 
@@ -96,6 +90,6 @@ When starting a new session on this repo, the agent MUST:
 4. Read `docs/ROADMAP.md`.
 5. Read the current phase in `docs/BUILD_SPEC.md`.
 6. Inspect relevant files before editing.
-7. Continue only the explicitly assigned task. Do not assume permission to start Task 17.
+7. Continue only the explicitly assigned task. Do not assume permission to start Phase 3.
 
-If asked to continue Phase 2, the next uncompleted task is Task 17 (`.github/workflows/ci.yml`).
+If asked to continue after Phase 2, read `docs/BUILD_SPEC.md` and `docs/ROADMAP.md` before selecting the next task.
