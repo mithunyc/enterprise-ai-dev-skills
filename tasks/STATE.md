@@ -14,11 +14,11 @@
 **Phase 1.5: COMPLETE** - orchestrator hardening and risk matrix work exists.
 **Phase 1.6: COMPLETE** - brownfield bootstrap compiler, manifest schema/example, diagnostic labs, and validator exist.
 **Phase 2: COMPLETE** - gate scripts, upstream audit, root governance, CI workflow, and install tests are implemented and locally verified.
-**Phase 3: NOT STARTED**
+**Phase 3: COMPLETE** - 6 reference docs created under reference/, generalized from AGENTS_v3.3, zero banned terms.
 **Phase 4: NOT STARTED**
 
-Current branch at Phase 2 completion: `main`
-Latest committed baseline before Task 17/18 finalization: `f37e403 docs: add repo agent governance`
+Current branch at Phase 3 completion: `main`
+Latest committed baseline before Phase 3: `0b9eba0 ci: add phase 2 workflow and install tests`
 
 ---
 
@@ -33,6 +33,19 @@ Read in this order before conclusions:
 5. Relevant files for the active task
 
 `docs/BUILD_SPEC.md` remains the task contract. `docs/ROADMAP.md` remains the product plan. This file records current project state and handoff truth.
+
+---
+
+## Phase 3 Evidence
+
+| Task | File | Status | Evidence |
+| --- | --- | --- | --- |
+| 19 | `reference/phase-engine.md` | COMPLETE | Present. 93 lines. Zero banned terms. §10, §10.2, §10.3 extracted. Section numbers stripped. |
+| 20 | `reference/autonomous-execution.md` | COMPLETE | Present. 96 lines. Zero banned terms. §31, §31.2, §31.5, §31.6 extracted. pnpm/supabase/RLS/Gmail sanitized. §31.3/§31.4 excluded. prd.json/progress.txt inlined. |
+| 21 | `reference/security-triggers.md` | COMPLETE | Present. Zero banned terms. §16 extracted (already generic). |
+| 22 | `reference/architecture-boundaries.md` | COMPLETE | Present. Zero banned terms. §17, §17.2, §17.3 extracted. Forward-phase reference generalized. |
+| 23 | `reference/quality-gates.md` | COMPLETE | Present. Zero banned terms. §32 fully generalized: pnpm/Supabase/Arkaan refs replaced with [YOUR_X] placeholders. |
+| 24 | `reference/drift-control.md` | COMPLETE | Present. Zero banned terms. §15 extracted (already fully generic). |
 
 ---
 
