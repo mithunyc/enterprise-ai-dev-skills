@@ -1,0 +1,12 @@
+{
+  "name": "acme-widget-app",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Acme Widget App — brownfield diagnostic fixture for enterprise-ai-dev-skills",
+  "scripts": {
+    "test": "node test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

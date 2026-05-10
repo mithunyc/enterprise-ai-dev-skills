@@ -3,7 +3,7 @@
 **Repo:** enterprise-ai-dev-skills
 **Remote:** https://github.com/mithunyc/enterprise-ai-dev-skills
 **Local:** C:\Users\mshmi\OneDrive\Apps\enterprise-ai-dev-skills
-**Last Updated:** 2026-05-10T07:45:00Z
+**Last Updated:** 2026-05-10T08:45:00Z
 
 ---
 
@@ -15,10 +15,10 @@
 **Phase 1.6: COMPLETE** - brownfield bootstrap compiler, manifest schema/example, diagnostic labs, and validator exist.
 **Phase 2: COMPLETE** - gate scripts, upstream audit, root governance, CI workflow, and install tests are implemented and locally verified.
 **Phase 3: COMPLETE** - 6 reference docs created under reference/, generalized from AGENTS_v3.3, zero banned terms.
-**Phase 4: NOT STARTED**
+**Phase 4: COMPLETE** - README rewrite, SECURITY.md update, greenfield example, brownfield fixture, v2.0.0 release.
 
-Current branch at Phase 3 completion: `main`
-Latest committed baseline before Phase 3: `0b9eba0 ci: add phase 2 workflow and install tests`
+Current branch at Phase 4 completion: `main`
+Tag at Phase 4 completion: `v2.0.0`
 
 ---
 
@@ -33,6 +33,18 @@ Read in this order before conclusions:
 5. Relevant files for the active task
 
 `docs/BUILD_SPEC.md` remains the task contract. `docs/ROADMAP.md` remains the product plan. This file records current project state and handoff truth.
+
+---
+
+## Phase 4 Evidence
+
+| Task | File | Status | Evidence |
+| --- | --- | --- | --- |
+| 25 | `README.md` | COMPLETE | Rewritten. CI badge, license badge, version badge. Tier table from curated-skills.json (MINIMAL=5, CORE=12, FULL=20, CONTRIBUTOR=1). Full lifecycle table (Steps 0–14). Project structure. What's New in v2.0.0. Explicit install commands for all 4 targets on macOS/Linux and Windows. |
+| 26 | `SECURITY.md` | COMPLETE | Full rewrite. Commit pinning explained with example SHA. protected_paths explained. Private vulnerability reporting: GitHub Security Advisories + email fallback. Installer behavior documented. Separated vulnerability reports from bug reports. |
+| 27 | `examples/greenfield-empty/README.md` | COMPLETE | All 10 GREENFIELD steps (0,1A,2,3,4,7,8,9,11,12,14) covered with realistic agent dialogue. .buildloop.yml shown as generated code block — NOT a file on disk. |
+| 28 | `examples/brownfield-broken-build/` | COMPLETE | README.md, AGENTS.md (stale, "Acme Widget App", 2024), test.mjs (intentionally broken, exits 1 — verified), package.json (test script only, no build/lint/deps), package-lock.json (lockfileVersion 3, zero deps). No .buildloop.yml present. |
+| 29 | `tasks/STATE.md`, tag `v2.0.0` | COMPLETE | This file updated. Tag pushed after commit. |
 
 ---
 
@@ -72,37 +84,34 @@ Run the gates relevant to the files touched:
 - Installer dry-runs when touching installer scripts
 - `git diff --check -- <touched files>` before handoff
 
-Phase 2 final verification set:
+Phase 4 final verification set:
 
-- `node tests/install.test.mjs`
-- `node scripts/validate-manifest.mjs`
-- `node scripts/audit-upstream.mjs`
-- `node --check` for every `scripts/*.mjs`
-- CI workflow text contract check for `push`, `pull_request`, required jobs, and `node tests/install.test.mjs`
-- `git diff --check -- .github/workflows/ci.yml tests/install.test.mjs templates/workflows/orchestrator.md tasks/STATE.md`
+- `node tests/install.test.mjs` → PASS (5/5)
+- `node scripts/validate-manifest.mjs` → PASS (all checks)
+- `node examples/brownfield-broken-build/test.mjs` → exits 1 (intentional — confirmed)
+- `git diff --check` → clean (LF→CRLF normalization warnings only, not errors)
+- Privacy scan (banned terms) → 0 matches across all Phase 4 files
 
 ---
 
 ## Open Risks
 
-| Risk | Severity | Current handling |
+| Risk | Severity | Current Handling |
 | --- | --- | --- |
 | Root `AGENTS.md` could drift from `templates/AGENTS.template.md` intent | LOW | Keep root file repo-specific and short; use template only for downstream repos. |
 | Upstream repos may move after audit | LOW | `audit-upstream.mjs` is read-only and should be rerun before releases or pin bumps. |
 | GitHub Actions YAML was not parsed with a dedicated local Actions linter | LOW | Workflow structure was text-checked locally; GitHub will validate it on push/PR. |
+| ROADMAP.md tier counts (FULL=19, CONTRIBUTOR=+2) are stale vs curated-skills.json (FULL=20, CONTRIBUTOR=1) | LOW | README tier table is derived from curated-skills.json (repo truth). ROADMAP.md is a planning doc and need not match exactly. Fix in a future cleanup PR. |
+| Install scripts fetch HEAD of main, not the v2.0.0 tag | LOW | Tag is informational and marks a snapshot. Enterprise users who need an exact pinned version should fork and pin their installer to a specific commit. Documented in release notes. |
 
 ---
 
 ## Session Handoff Instruction
 
-When starting a new session on this repo, the agent MUST:
+**All roadmap phases are complete (Phases 0–4). v2.0.0 is released.**
 
-1. Read root `AGENTS.md`.
-2. Run `git status --short`, `git branch --show-current`, and `git log -1 --oneline`.
-3. Read `tasks/STATE.md`.
-4. Read `docs/ROADMAP.md`.
-5. Read the current phase in `docs/BUILD_SPEC.md`.
-6. Inspect relevant files before editing.
-7. Continue only the explicitly assigned task. Do not assume permission to start Phase 3.
-
-If asked to continue after Phase 2, read `docs/BUILD_SPEC.md` and `docs/ROADMAP.md` before selecting the next task.
+For future work on this repo:
+- Follow `CONTRIBUTING.md` for adding skills, templates, or schemas.
+- Run quality gates (`node tests/install.test.mjs`, `node scripts/validate-manifest.mjs`) before any PR.
+- Do not create new phases without updating `docs/ROADMAP.md` and `docs/BUILD_SPEC.md` first.
+- If upstream skill repos have moved, run `node scripts/audit-upstream.mjs` and bump pins manually.
