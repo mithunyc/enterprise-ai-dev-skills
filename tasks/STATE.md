@@ -153,7 +153,6 @@ Read `docs/BUILD_SPEC.md` — Phase 1 section — for full task detail.
 
 - **Planning doc:** docs/ROADMAP.md
 - **Build spec:** docs/BUILD_SPEC.md
-- **Audit history:** audits/ (ChatGPT critique, prior roadmap versions)
 - **Skills source:** C:\Users\mshmi\OneDrive\Apps\enterprisegradesoftwireos\
 
 ---

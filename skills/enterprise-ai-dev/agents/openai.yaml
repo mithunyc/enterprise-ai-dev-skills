@@ -1,4 +1,4 @@
 interface:
   display_name: "Enterprise AI Dev"
-  short_description: "End-to-end AI software delivery with enterprise gates."
-  default_prompt: "Build this feature end to end with enterprise-grade planning, tests, review, security, and release readiness."
+  short_description: "Master CTO orchestrator for enterprise AI software delivery."
+  default_prompt: "Use enterprise-ai-dev as my master CTO orchestrator for this repo."

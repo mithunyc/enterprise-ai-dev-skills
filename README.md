@@ -87,6 +87,16 @@ Restart your AI coding agent after installing skills.
 
 ## Verify Installation
 
+The canonical global skill name is `enterprise-ai-dev`.
+
+Use this exact prompt in a fresh Codex session when you want the master CTO / orchestrator behavior:
+
+```text
+Use enterprise-ai-dev as my master CTO orchestrator for this repo.
+```
+
+Treat phrases like `/orchestrator` or `become my master CTO orchestrator` as best-effort natural-language matching, not guaranteed platform features unless Codex documents slash-command support for skills.
+
 Ask your agent:
 
 ```text
@@ -96,10 +106,18 @@ List installed skills related to enterprise-ai-dev and explain when you would us
 Then try:
 
 ```text
-Use enterprise-ai-dev to plan a small production-ready feature.
+Use enterprise-ai-dev as my master CTO orchestrator for this repo.
 ```
 
 If the agent does not see the skill, restart the app. If it still does not see it, install only to the project-local skills directory supported by that agent.
+
+For future machines, verify in this order:
+
+1. Install the skill to Codex global skills.
+2. Restart Codex.
+3. Start a fresh session.
+4. Ask with the canonical prompt above.
+5. Confirm the response follows enterprise planning, verification, and release-discipline behavior.
 
 ## Design Philosophy
 
@@ -115,7 +133,7 @@ If the agent does not see the skill, restart the app. If it still does not see i
 After installation, start a new Codex session and say:
 
 ```text
-Use enterprise-ai-dev to plan and build this product end to end.
+Use enterprise-ai-dev as my master CTO orchestrator for this repo.
 ```
 
 For an existing repo, first run:

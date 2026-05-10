@@ -1,13 +1,16 @@
 ---
 name: enterprise-ai-dev
 description: >
-  End-to-end enterprise-grade AI software delivery workflow. The master
-  orchestrator for spec-to-production development. Invoke with /orchestrator
-  or use when asked to build, fix, refactor, launch, review, harden, or
-  operate software — especially when the request involves: enterprise-grade,
-  production-ready, brownfield project, new project, PRD, architecture, TDD,
-  QA, security, deployment, or release. Automatically selects GREENFIELD,
-  BROWNFIELD, GOVERNED, REVIEW_ONLY, or AUTONOMOUS profile.
+  End-to-end enterprise-grade AI software delivery workflow. The master CTO
+  orchestrator for spec-to-production development. Prefer explicit invocation
+  with "Use enterprise-ai-dev as my master CTO orchestrator for this repo."
+  Treat /orchestrator or similar natural-language phrasing as best-effort
+  aliasing, not a guaranteed platform command. Use when asked to build, fix,
+  refactor, launch, review, harden, or operate software — especially when the
+  request involves: enterprise-grade, production-ready, brownfield project,
+  new project, PRD, architecture, TDD, QA, security, deployment, or release.
+  Automatically selects GREENFIELD, BROWNFIELD, GOVERNED, REVIEW_ONLY, or
+  AUTONOMOUS profile.
 ---
 
 # Enterprise AI Dev — Spec-to-Production Control Plane
