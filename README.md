@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml/badge.svg)](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.0.0-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.0)
+[![Version](https://img.shields.io/badge/version-v2.0.1-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.1)
 
 **Spec-to-production control plane for AI-assisted software delivery.**
 
