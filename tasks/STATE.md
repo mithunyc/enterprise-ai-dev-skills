@@ -12,6 +12,7 @@
 **Phase 0: COMPLETE** ✅
 **Phase 1: COMPLETE** ✅ — All templates, schemas, and reference docs built and verified
 **Phase 1.5: COMPLETE** ✅ — Orchestrator hardening (Opus + Gemini reconciliation)
+**Phase 1.6: COMPLETE** ✅ — Brownfield bootstrap compiler (manifest schema, example, diagnostic labs, validator)
 **Phase 2: NOT STARTED**
 **Phase 3: NOT STARTED**
 **Phase 4: NOT STARTED**
@@ -99,6 +100,29 @@ Read `docs/BUILD_SPEC.md` — Phase 1 section — for full task detail.
 - [ ] No duplicate orchestrator skill
 - [ ] risk-matrix.md exists
 - [ ] No leaked private references
+- [ ] Committed to git
+
+---
+
+## What Was Done (Phase 1.6 — Evidence)
+
+| Task | File | Status |
+|------|------|--------|
+| Manifest JSON Schema | schemas/orchestrator-manifest.schema.json | ✅ Done — draft-07, 10 required top-level fields, evidence_type, freshness metadata |
+| Example manifest | templates/orchestrator-manifest.example.json | ✅ Done — governed brownfield with override, lessons, special gates, external memory |
+| Diagnostic labs reference | reference/brownfield-diagnostic-labs.md | ✅ Done — 10 labs (Lab 0–9), read-only scan, manifest-only output |
+| Validation script | scripts/validate-manifest.mjs | ✅ Done — zero-dep, 148 lines, validates schema + example + privacy |
+| BUILD_SPEC update | docs/BUILD_SPEC.md | ✅ Done — Phase 1.6 section with allowed/forbidden/verification/exit criteria |
+| ROADMAP update | docs/ROADMAP.md | ✅ Done — one line added to Foundation law |
+| STATE.md update | tasks/STATE.md | ✅ Done |
+
+**Phase 1.6 Gate — PENDING VERIFICATION:**
+- [ ] Schema is valid draft-07 JSON
+- [ ] Example is valid JSON and matches schema structure
+- [ ] Diagnostic labs document exists with all 10 labs
+- [ ] Validator script exits 0
+- [ ] No private project names in new files
+- [ ] BUILD_SPEC.md has Phase 1.6 section
 - [ ] Committed to git
 
 ---

@@ -14,7 +14,7 @@
 ## The Three Laws
 
 1. **Determinism:** Every gate/receipt/handoff uses YAML frontmatter validated by schemas. Markdown=humans, schema-validated YAML=control plane.
-2. **Foundation:** Never build on a broken repo. ALL projects get a minimal audit (Step 1A). Brownfield gets full diagnostic (Step 1B) BEFORE features.
+2. **Foundation:** Never build on a broken repo. ALL projects get a minimal audit (Step 1A). Brownfield gets full diagnostic (Step 1B) BEFORE features. Brownfield governed repos require a bootstrap manifest (`orchestrator-manifest.json`) before execution.
 3. **Planning:** 60% effort on Steps 0–8. Use risk-scaled grill-me probes: Low=1-2, Medium=3, High=5-7, never >7 unless human asks.
 
 ---

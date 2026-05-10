@@ -199,6 +199,73 @@ VERIFY: File exists. Contains SKILL.md template section.
 
 ---
 
+## Phase 1.6: Brownfield Bootstrap Compiler
+
+**Objective:** Compile repo governance into a machine-readable `orchestrator-manifest.json` before brownfield execution. Replace ad-hoc LLM inference over large governance files with a deterministic, schema-validated manifest contract.
+
+**Decision:** The manifest is a compact map — pointers to repo-local truth paths. It does not copy governance content.
+
+**Allowed files:**
+- `schemas/orchestrator-manifest.schema.json` (CREATE)
+- `templates/orchestrator-manifest.example.json` (CREATE)
+- `reference/brownfield-diagnostic-labs.md` (CREATE)
+- `scripts/validate-manifest.mjs` (CREATE — optional, zero-dep validator)
+- `docs/BUILD_SPEC.md` (UPDATE — this section)
+- `docs/ROADMAP.md` (UPDATE — one line)
+- `tasks/STATE.md` (UPDATE)
+
+**Forbidden files:**
+- New orchestrator skill (must NOT exist)
+- `skills/enterprise-ai-dev/SKILL.md` (no rewrite — pointer only if needed)
+- Autonomous BuildLoop implementation
+- Obsidian integration code
+- Graphify integration code
+- Install script modifications
+- Project-specific rules (no private repo names)
+
+**Core design rules:**
+1. Manifest fields point to repo-local truth paths; they do not copy docs
+2. Repo-local governance outranks global fallback rules
+3. Every inferrable field carries `evidence_type: extracted | inferred`
+4. Active overrides require freshness metadata with `last_verified` and `verification_method`
+5. Lessons are never auto-committed — failures create candidates for human approval
+6. External memory (Obsidian, Graphify) is advisory-only and demand-loaded
+7. Token policy caps session startup to prevent context saturation
+8. `not_code_repo` classification requires `code_paths` to be empty (prevents monorepo false positives)
+
+**Verification checks:**
+```
+1. git status --short
+2. git branch --show-current
+3. Verify only allowed files changed
+4. node -e "JSON.parse(require('fs').readFileSync('schemas/orchestrator-manifest.schema.json'))"
+5. node -e "JSON.parse(require('fs').readFileSync('templates/orchestrator-manifest.example.json'))"
+6. node scripts/validate-manifest.mjs (if validator exists)
+7. reference/brownfield-diagnostic-labs.md exists
+8. This section exists in BUILD_SPEC.md
+9. grep -rn "Arkaan\|UnionForge\|PowerSync\|Supabase\|SPRINT-ZERO\|GodMode" schemas/ templates/ reference/brownfield-diagnostic-labs.md
+   → must return 0 results (private names banned from generic artifacts)
+10. git diff --stat
+```
+
+**Dogfood tests (Phase 2 integration):**
+- `tests/install.test.mjs` should validate the new schema and example (add when Phase 2 begins)
+- Manifest example should validate against the schema
+
+**Exit criteria:**
+- [ ] Schema is valid draft-07 JSON
+- [ ] Example is valid JSON and matches schema structure
+- [ ] Diagnostic labs document exists with all 10 labs
+- [ ] Validator script exists and exits 0
+- [ ] No private project names in any new file
+- [ ] BUILD_SPEC.md has this section
+- [ ] STATE.md updated
+- [ ] Commit: `phase-1.6: brownfield bootstrap compiler`
+
+**Rollback:** `git checkout HEAD -- schemas/orchestrator-manifest.schema.json templates/orchestrator-manifest.example.json reference/brownfield-diagnostic-labs.md scripts/validate-manifest.mjs docs/BUILD_SPEC.md docs/ROADMAP.md tasks/STATE.md`
+
+---
+
 ## Phase 2: Gate Scripts + Dogfooding
 
 ### Task 14: scripts/gate-runner.mjs

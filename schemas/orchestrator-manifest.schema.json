@@ -1,0 +1,532 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrchestratorManifest",
+  "description": "Compiled map of a target repo's governance, state, and quality gates. Produced by the bootstrap diagnostic labs. Consumed by the orchestrator at session start instead of scanning raw governance files.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "generated_by",
+    "repo_profile",
+    "governance",
+    "execution",
+    "quality_gates",
+    "health",
+    "token_policy",
+    "decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Manifest schema version. Bump on breaking changes."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of manifest generation."
+    },
+    "generated_by": {
+      "type": "string",
+      "description": "Agent or human identifier that produced this manifest."
+    },
+    "repo_profile": {
+      "type": "object",
+      "required": ["repo_type", "confidence", "repo_root"],
+      "properties": {
+        "repo_type": {
+          "type": "string",
+          "enum": ["greenfield", "brownfield", "governed", "mixed", "not_code_repo", "unknown"],
+          "description": "Classification of the repo. 'not_code_repo' requires code_paths to be empty."
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"],
+          "description": "Confidence in the repo_type classification."
+        },
+        "evidence_type": {
+          "type": "string",
+          "enum": ["extracted", "inferred"],
+          "description": "Whether repo_type was read from an explicit declaration or inferred from signals."
+        },
+        "repo_root": {
+          "type": "string",
+          "description": "Absolute path to the repo root."
+        },
+        "code_paths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Relative paths to directories containing application code. Prevents not_code_repo false positives on monorepos with large docs/ folders."
+        },
+        "package_manager": {
+          "type": "string",
+          "description": "Detected package manager: npm, pnpm, yarn, bun, pip, cargo, go, make, none, etc."
+        },
+        "runtime": {
+          "type": "string",
+          "description": "Primary runtime: node, deno, bun, python, go, rust, dotnet, etc."
+        },
+        "monorepo": {
+          "type": "boolean",
+          "description": "True if multiple packages/apps detected."
+        },
+        "app_surfaces": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["web", "mobile", "api", "desktop", "cli", "library", "docs_only"]
+          },
+          "description": "Application surfaces detected."
+        }
+      },
+      "additionalProperties": false
+    },
+    "governance": {
+      "type": "object",
+      "required": ["authority_chain"],
+      "properties": {
+        "authority_chain": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "role"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Relative path from repo root to the authority file."
+              },
+              "role": {
+                "type": "string",
+                "description": "What this file governs: supreme_authority, engineering_standards, execution_control, gate_definitions, task_tracking, etc."
+              },
+              "status": {
+                "type": "string",
+                "enum": ["active", "stale", "archived", "missing"],
+                "description": "Whether the file is current and applicable."
+              },
+              "evidence_type": {
+                "type": "string",
+                "enum": ["extracted", "inferred"],
+                "description": "Whether the role was declared in the file or inferred from content."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Ordered authority chain. Index 0 is highest authority. Paths are repo-relative."
+        },
+        "state_tracking": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["path", "format"],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Relative path to the state tracking file."
+                },
+                "format": {
+                  "type": "string",
+                  "enum": ["state_md", "task_ledger", "json", "yaml", "other"],
+                  "description": "Format of the state tracker."
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "description": "Where state tracking lives. Null if not found."
+        },
+        "evidence_system": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["path", "format"],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Relative path to the evidence/receipt directory or file."
+                },
+                "format": {
+                  "type": "string",
+                  "enum": ["receipts_dir", "bundle_readmes", "changelog", "other"],
+                  "description": "How evidence is organized."
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "description": "Where evidence receipts live. Null if not found."
+        },
+        "lessons": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["path"],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Relative path to the lessons/immune system file."
+                },
+                "gate_candidates_path": {
+                  "type": "string",
+                  "description": "Relative path to the staging file for new lesson candidates. Candidates require human approval before promotion to the lessons file."
+                },
+                "auto_commit": {
+                  "type": "boolean",
+                  "const": false,
+                  "description": "Must be false. Lessons are NEVER auto-committed. Failures produce candidates for human review."
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "description": "Immune system / lessons-learned file. Null if not found."
+        },
+        "active_overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "status", "freshness"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Relative path to the override file."
+              },
+              "status": {
+                "type": "string",
+                "enum": ["active", "stale_risk", "expired", "unknown"],
+                "description": "Whether the override is currently valid."
+              },
+              "freshness": {
+                "type": "object",
+                "required": ["last_verified"],
+                "properties": {
+                  "last_verified": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "ISO 8601 timestamp of the last freshness verification."
+                  },
+                  "verification_method": {
+                    "type": "string",
+                    "enum": ["git_log", "file_mtime", "human_confirmed", "unverified"],
+                    "description": "How freshness was determined."
+                  },
+                  "max_age_days": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Maximum days before the override is automatically flagged as stale_risk."
+                  }
+                },
+                "additionalProperties": false
+              },
+              "blocks_feature_work": {
+                "type": "boolean",
+                "description": "If true, no feature work can proceed while this override is active."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Active governance overrides (sprint zero, feature freeze, stabilization). Empty array if none."
+        },
+        "deferred_triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "description"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Trigger identifier."
+              },
+              "description": {
+                "type": "string",
+                "description": "What triggers promotion of deferred work."
+              },
+              "probe_type": {
+                "type": "string",
+                "enum": ["sql", "cli", "manual", "metric"],
+                "description": "How to check if the trigger has fired."
+              },
+              "last_checked": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When the trigger was last checked."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Data-driven triggers that auto-promote deferred work when conditions fire. Empty array if none."
+        }
+      },
+      "additionalProperties": false
+    },
+    "execution": {
+      "type": "object",
+      "required": ["work_unit", "vocabulary"],
+      "properties": {
+        "work_unit": {
+          "type": "string",
+          "enum": ["story", "bundle", "ticket", "task", "issue", "unknown"],
+          "description": "The repo's native unit of work."
+        },
+        "vocabulary": {
+          "type": "object",
+          "properties": {
+            "work_unit_term": {
+              "type": "string",
+              "description": "What the repo calls its work units (e.g., 'bundle', 'story', 'ticket')."
+            },
+            "completion_term": {
+              "type": "string",
+              "description": "What 'done' looks like (e.g., 'COMPLETE', 'DONE', 'CLOSED')."
+            },
+            "phase_term": {
+              "type": "string",
+              "description": "What the repo calls phases (e.g., 'sprint', 'phase', 'milestone', 'wave')."
+            }
+          },
+          "additionalProperties": true,
+          "description": "Repo-specific terminology. Use these terms in all orchestrator output."
+        },
+        "ordering": {
+          "type": "string",
+          "enum": ["strict_dependency_chain", "priority_queue", "ad_hoc", "unknown"],
+          "description": "How work units are sequenced."
+        },
+        "current_position": {
+          "type": "string",
+          "description": "ID or name of the current/next work unit to execute."
+        }
+      },
+      "additionalProperties": false
+    },
+    "quality_gates": {
+      "type": "object",
+      "properties": {
+        "local_commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "command"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Gate name: lint, typecheck, test, build, verify, etc."
+              },
+              "command": {
+                "type": "string",
+                "description": "Exact CLI command to run."
+              },
+              "source": {
+                "type": "string",
+                "enum": ["package_json", "makefile", "ci_workflow", "governance_doc", "manual"],
+                "description": "Where this command was discovered."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Commands to run locally for quality verification."
+        },
+        "ci_workflows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Relative path to CI workflow file."
+              },
+              "trigger": {
+                "type": "string",
+                "description": "What triggers this workflow (push, PR, manual)."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "CI workflow files detected."
+        },
+        "special_gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Gate name."
+              },
+              "type": {
+                "type": "string",
+                "enum": ["elimination_grep", "schema_parity", "brand_compliance", "mechanical_script", "manual_verification", "other"],
+                "description": "Type of special gate."
+              },
+              "command": {
+                "type": "string",
+                "description": "Command to run, if applicable."
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable description of what this gate checks."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Non-standard verification gates (elimination greps, schema parity checks, etc.)."
+        },
+        "protected_paths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Glob patterns for paths that must not change without explicit approval."
+        }
+      },
+      "additionalProperties": false
+    },
+    "external_memory": {
+      "type": "object",
+      "properties": {
+        "obsidian": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["vault_path", "project_folder"],
+              "properties": {
+                "vault_path": {
+                  "type": "string",
+                  "description": "Absolute path to the Obsidian vault root."
+                },
+                "project_folder": {
+                  "type": "string",
+                  "description": "Relative path within the vault to this project's folder."
+                },
+                "advisory_only": {
+                  "type": "boolean",
+                  "const": true,
+                  "description": "Must be true. Obsidian content is retrieved on demand only. Never ingested into context at startup."
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "description": "Obsidian vault link. Null if not configured."
+        },
+        "graphify": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["advisory_only"],
+              "properties": {
+                "endpoint": {
+                  "type": "string",
+                  "description": "Graphify API endpoint or file path."
+                },
+                "advisory_only": {
+                  "type": "boolean",
+                  "const": true,
+                  "description": "Must be true. Graphify is optional and advisory."
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "description": "Graphify link. Null if not configured."
+        }
+      },
+      "additionalProperties": false,
+      "description": "External knowledge sources. All are advisory-only and retrieved on demand."
+    },
+    "health": {
+      "type": "object",
+      "required": ["install", "lint", "typecheck", "test", "build"],
+      "properties": {
+        "install":   { "type": "string", "enum": ["ok", "warn", "fail", "unknown"] },
+        "lint":      { "type": "string", "enum": ["ok", "warn", "fail", "unknown", "n/a"] },
+        "typecheck": { "type": "string", "enum": ["ok", "warn", "fail", "unknown", "n/a"] },
+        "test":      { "type": "string", "enum": ["ok", "warn", "fail", "unknown", "none"] },
+        "build":     { "type": "string", "enum": ["ok", "warn", "fail", "unknown"] },
+        "ci":        { "type": "string", "enum": ["ok", "warn", "fail", "unknown", "n/a"] },
+        "test_count": { "type": "integer", "minimum": 0, "description": "Number of tests detected. 0 if none." },
+        "last_verified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When health was last checked."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Health check results from running the repo's native commands."
+    },
+    "token_policy": {
+      "type": "object",
+      "required": ["max_startup_files", "max_startup_chars", "load_policy"],
+      "properties": {
+        "max_startup_files": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Maximum files to load at session start. Default 5."
+        },
+        "max_startup_chars": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 20000,
+          "description": "Maximum total characters to load at session start. Must respect falsification condition #3 (<=12K for governance)."
+        },
+        "load_policy": {
+          "type": "string",
+          "enum": ["manifest_only", "manifest_plus_state", "manifest_plus_active_task", "full_governance"],
+          "description": "What to load at session start. manifest_only is fastest. full_governance is legacy fallback."
+        },
+        "startup_files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Ordered list of files to load at session start. Agent loads these and ONLY these."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Controls context window usage at session start."
+    },
+    "decision": {
+      "type": "object",
+      "required": ["recommended_path"],
+      "properties": {
+        "recommended_path": {
+          "type": "string",
+          "enum": ["overlay_only", "stabilize_then_continue", "contain_and_carve", "restructure", "halt"],
+          "description": "Recommended adoption path. See reference/bootstrap-protocol.md for definitions."
+        },
+        "feature_work_blocked": {
+          "type": "boolean",
+          "description": "If true, no feature work can proceed. Reasons: active override, stabilization required, or health failure."
+        },
+        "block_reason": {
+          "type": "string",
+          "description": "Why feature work is blocked. Required if feature_work_blocked is true."
+        },
+        "unresolved_questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["question", "impact"],
+            "properties": {
+              "question": { "type": "string" },
+              "impact": {
+                "type": "string",
+                "enum": ["blocks_execution", "affects_architecture", "informational"],
+                "description": "How much this question matters."
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Questions that could not be resolved during bootstrap. Must be presented to human."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Compiled decision output from the diagnostic labs."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,193 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-01-15T14:30:00Z",
+  "generated_by": "enterprise-ai-dev bootstrap labs",
+  "repo_profile": {
+    "repo_type": "governed",
+    "confidence": "high",
+    "evidence_type": "extracted",
+    "repo_root": "/absolute/path/to/repo",
+    "code_paths": ["src/", "packages/", "apps/"],
+    "package_manager": "npm",
+    "runtime": "node",
+    "monorepo": true,
+    "app_surfaces": ["web", "mobile", "api"]
+  },
+  "governance": {
+    "authority_chain": [
+      {
+        "path": "MISSION_CONTROL.md",
+        "role": "supreme_authority",
+        "status": "active",
+        "evidence_type": "extracted"
+      },
+      {
+        "path": ".governance/gates.md",
+        "role": "gate_definitions",
+        "status": "active",
+        "evidence_type": "extracted"
+      },
+      {
+        "path": "CLAUDE.md",
+        "role": "engineering_standards",
+        "status": "active",
+        "evidence_type": "extracted"
+      },
+      {
+        "path": "AGENTS.md",
+        "role": "agent_protocol",
+        "status": "active",
+        "evidence_type": "inferred"
+      }
+    ],
+    "state_tracking": {
+      "path": ".governance/task-ledger.md",
+      "format": "task_ledger"
+    },
+    "evidence_system": {
+      "path": "docs/bundles/",
+      "format": "bundle_readmes"
+    },
+    "lessons": {
+      "path": ".governance/lessons.md",
+      "gate_candidates_path": ".governance/lesson-candidates.md",
+      "auto_commit": false
+    },
+    "active_overrides": [
+      {
+        "path": ".governance/sprint-zero.md",
+        "status": "active",
+        "freshness": {
+          "last_verified": "2026-01-15T14:30:00Z",
+          "verification_method": "git_log",
+          "max_age_days": 30
+        },
+        "blocks_feature_work": true
+      }
+    ],
+    "deferred_triggers": [
+      {
+        "id": "PHASE2-PARTITIONING",
+        "description": "Fire when any table exceeds 5000 rows per tenant",
+        "probe_type": "sql",
+        "last_checked": "2026-01-15T00:00:00Z"
+      },
+      {
+        "id": "SEARCH-MIGRATION",
+        "description": "Fire when searchable records exceed 50000 or search UX is too slow",
+        "probe_type": "manual",
+        "last_checked": "2026-01-15T00:00:00Z"
+      }
+    ]
+  },
+  "execution": {
+    "work_unit": "bundle",
+    "vocabulary": {
+      "work_unit_term": "bundle",
+      "completion_term": "COMPLETE",
+      "phase_term": "sprint"
+    },
+    "ordering": "strict_dependency_chain",
+    "current_position": "S0-01D"
+  },
+  "quality_gates": {
+    "local_commands": [
+      {
+        "name": "typecheck",
+        "command": "npm run typecheck",
+        "source": "package_json"
+      },
+      {
+        "name": "lint",
+        "command": "npm run lint",
+        "source": "package_json"
+      },
+      {
+        "name": "test",
+        "command": "npm test",
+        "source": "package_json"
+      },
+      {
+        "name": "build",
+        "command": "npm run build",
+        "source": "package_json"
+      },
+      {
+        "name": "verify",
+        "command": "npm run verify",
+        "source": "package_json"
+      }
+    ],
+    "ci_workflows": [
+      {
+        "path": ".github/workflows/ci.yml",
+        "trigger": "push, pull_request"
+      },
+      {
+        "path": ".github/workflows/brand-spec.yml",
+        "trigger": "pull_request"
+      }
+    ],
+    "special_gates": [
+      {
+        "name": "localStorage elimination",
+        "type": "elimination_grep",
+        "command": "grep -rn 'localStorage' packages/shared-logic/ --include='*.ts' --include='*.tsx'",
+        "description": "Must return 0 results. Any localStorage usage in shared-logic is a P0 bug."
+      },
+      {
+        "name": "schema parity",
+        "type": "schema_parity",
+        "description": "App schema must match database migration output. Checked via diff."
+      }
+    ],
+    "protected_paths": [
+      ".env*",
+      "**/*.key",
+      "**/*.pem",
+      ".github/workflows/**",
+      "migrations/**",
+      "infra/**"
+    ]
+  },
+  "external_memory": {
+    "obsidian": {
+      "vault_path": "/absolute/path/to/obsidian/vault",
+      "project_folder": "20_Projects/my-project",
+      "advisory_only": true
+    },
+    "graphify": null
+  },
+  "health": {
+    "install": "ok",
+    "lint": "ok",
+    "typecheck": "ok",
+    "test": "ok",
+    "build": "ok",
+    "ci": "ok",
+    "test_count": 52,
+    "last_verified": "2026-01-15T14:25:00Z"
+  },
+  "token_policy": {
+    "max_startup_files": 5,
+    "max_startup_chars": 12000,
+    "load_policy": "manifest_plus_active_task",
+    "startup_files": [
+      "orchestrator-manifest.json",
+      ".governance/task-ledger.md",
+      ".governance/lessons.md",
+      "CLAUDE.md"
+    ]
+  },
+  "decision": {
+    "recommended_path": "stabilize_then_continue",
+    "feature_work_blocked": true,
+    "block_reason": "Active sprint-zero override blocks all feature work until data authority closure is complete.",
+    "unresolved_questions": [
+      {
+        "question": "Should the sprint-zero override be refreshed or expired? Last verified 15 days ago.",
+        "impact": "blocks_execution"
+      }
+    ]
+  }
+}
