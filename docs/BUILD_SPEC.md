@@ -145,6 +145,60 @@ VERIFY: File exists. Contains SKILL.md template section.
 
 ---
 
+## Phase 1.5: Orchestrator Hardening
+
+**Objective:** Reconcile Opus + Gemini adversarial reviews and apply the smallest robust hardening patch to the master orchestrator skill before Phase 2.
+
+**Decision:** Evolve `skills/enterprise-ai-dev/SKILL.md`. Do NOT create a separate orchestrator skill.
+
+**Allowed files:**
+- `skills/enterprise-ai-dev/SKILL.md` (UPDATE)
+- `skills/enterprise-ai-dev/references/risk-matrix.md` (CREATE)
+- `docs/BUILD_SPEC.md` (UPDATE — this section)
+- `tasks/STATE.md` (UPDATE)
+
+**Forbidden files:**
+- `skills/enterprise-ai-dev-orchestrator/` (must NOT exist)
+- `skills/enterprise-ai-dev/references/authority-order.md` (inlined instead)
+- `skills/enterprise-ai-dev/references/lessons-protocol.md` (deferred)
+- `skills/enterprise-ai-dev/references/antigravity-usage.md` (deferred)
+
+**Changes to SKILL.md:**
+1. `/orchestrator` explicit trigger in frontmatter description
+2. Honest limitation disclaimer
+3. Claim labels (FACT/INFERENCE/JUDGMENT/UNVERIFIED) inlined
+4. Authority order (6 levels) inlined — project-local overrides global
+5. Expanded Step 0: GREENFIELD, BROWNFIELD, GOVERNED, STALE_OR_MIXED, REVIEW_ONLY, RELEASE, AUTONOMOUS_LOOP
+6. Self-review checklist (6 questions)
+7. Output contract (planning + execution formats)
+8. Max 3 fix attempts stop condition
+9. Delegation rule — orchestrator routes, does not pretend to be every specialist
+
+**Verification checks:**
+```
+1. git status --short
+2. git branch --show-current
+3. SKILL.md frontmatter has name + description with /orchestrator
+4. SKILL.md ≤ 10,000 chars
+5. Only one orchestrator skill under skills/
+6. references/risk-matrix.md exists
+7. No forbidden files created
+8. No private project references (Arkaan, UnionForge, Supabase, PowerSync)
+9. git diff --stat
+```
+
+**Rollback:** `git checkout HEAD -- skills/enterprise-ai-dev/ docs/BUILD_SPEC.md tasks/STATE.md`
+
+**Phase 1.5 Gate:**
+- [ ] SKILL.md ≤ 10K chars
+- [ ] /orchestrator in description
+- [ ] No duplicate orchestrator skill
+- [ ] risk-matrix.md exists
+- [ ] No leaked private references
+- [ ] Commit: `phase-1.5: orchestrator hardening`
+
+---
+
 ## Phase 2: Gate Scripts + Dogfooding
 
 ### Task 14: scripts/gate-runner.mjs

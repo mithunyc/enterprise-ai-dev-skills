@@ -3,7 +3,7 @@
 **Repo:** enterprise-ai-dev-skills
 **Remote:** https://github.com/mithunyc/enterprise-ai-dev-skills
 **Local:** C:\Users\mshmi\OneDrive\Apps\enterprise-ai-dev-skills
-**Last Updated:** 2026-05-09T00:15:00Z
+**Last Updated:** 2026-05-10T03:35:00Z
 
 ---
 
@@ -11,6 +11,7 @@
 
 **Phase 0: COMPLETE** ✅
 **Phase 1: COMPLETE** ✅ — All templates, schemas, and reference docs built and verified
+**Phase 1.5: COMPLETE** ✅ — Orchestrator hardening (Opus + Gemini reconciliation)
 **Phase 2: NOT STARTED**
 **Phase 3: NOT STARTED**
 **Phase 4: NOT STARTED**
@@ -76,6 +77,32 @@ Read `docs/BUILD_SPEC.md` — Phase 1 section — for full task detail.
 
 ---
 
+## What Was Done (Phase 1.5 — Evidence)
+
+| Task | File | Status |
+|------|------|--------|
+| Add /orchestrator trigger | skills/enterprise-ai-dev/SKILL.md frontmatter | ✅ Done |
+| Limitation disclaimer | SKILL.md body | ✅ Done |
+| Inline claim labels | SKILL.md — FACT/INFERENCE/JUDGMENT/UNVERIFIED | ✅ Done |
+| Inline authority order | SKILL.md — 6 levels, project-local overrides | ✅ Done |
+| Expand Step 0 | SKILL.md — 7 classifications (was 3) | ✅ Done |
+| Self-review checklist | SKILL.md — 6 questions | ✅ Done |
+| Output contract | SKILL.md — planning + execution formats | ✅ Done |
+| Max 3 attempts stop | SKILL.md — stop conditions | ✅ Done |
+| Delegation rule | SKILL.md — routes to specialists | ✅ Done |
+| Risk matrix | references/risk-matrix.md | ✅ Created |
+| Build spec update | docs/BUILD_SPEC.md — Phase 1.5 section | ✅ Done |
+
+**Phase 1.5 Gate — PENDING VERIFICATION:**
+- [ ] SKILL.md ≤ 10K chars
+- [ ] /orchestrator in description
+- [ ] No duplicate orchestrator skill
+- [ ] risk-matrix.md exists
+- [ ] No leaked private references
+- [ ] Committed to git
+
+---
+
 ## Source Material Paths (agent must use these)
 
 | Source | Path |
@@ -112,7 +139,7 @@ Read `docs/BUILD_SPEC.md` — Phase 1 section — for full task detail.
 When starting a new session on this repo, the agent MUST:
 1. Read this file (tasks/STATE.md)
 2. Read docs/ROADMAP.md
-3. Read docs/BUILD_SPEC.md (Phase 1 section)
+3. Read docs/BUILD_SPEC.md (Phase 2 section)
 4. Run: git status, git branch --show-current, git log -1 --oneline
-5. Verify Phase 0 files exist (5 skills, curated-skills.json, scripts/install.ps1)
-6. Begin Phase 1 — Task 6 (AGENTS.template.md)
+5. Verify Phase 0 + 1 + 1.5 files exist
+6. Begin Phase 2 — Task 14 (gate-runner.mjs)
