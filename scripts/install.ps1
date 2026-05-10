@@ -11,7 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# ── Skill lists per mode ────────────────────────────────────────────────────
+# -- Skill lists per mode ---------------------------------------------------
 $LocalSkillsByMode = @{
   minimal     = @("enterprise-ai-dev", "karpathy-guidelines")
   core        = @("enterprise-ai-dev", "karpathy-guidelines", "awesome-design-md", "caveman")
@@ -39,6 +39,7 @@ $UpstreamByMode = @{
     "mattpocock/skills" = @(
       "skills/engineering/tdd", "skills/engineering/diagnose",
       "skills/engineering/grill-with-docs", "skills/engineering/to-prd",
+      "skills/engineering/triage",
       "skills/engineering/improve-codebase-architecture", "skills/engineering/zoom-out",
       "skills/engineering/setup-matt-pocock-skills"
     )
@@ -49,10 +50,12 @@ $UpstreamByMode = @{
     )
     "openai/skills"     = @("skills/.curated/security-best-practices", "skills/.curated/security-threat-model")
   }
-  contributor = @{}
+  contributor = @{
+    "mattpocock/skills" = @("skills/productivity/write-a-skill")
+  }
 }
 
-# ── Target resolution ───────────────────────────────────────────────────────
+# -- Target resolution ------------------------------------------------------
 function Resolve-SkillsDirs {
   param([string[]]$Targets)
   $expanded = @()
@@ -72,7 +75,7 @@ function Resolve-SkillsDirs {
   return $dirs
 }
 
-# ── Conflict detection ──────────────────────────────────────────────────────
+# -- Conflict detection -----------------------------------------------------
 function Get-ConflictReport {
   param([string]$DestRoot, [string[]]$IncomingSkills)
   $conflicts = @()
@@ -95,7 +98,7 @@ function Get-GovernanceConflicts {
   return $found
 }
 
-# ── Copy helpers ────────────────────────────────────────────────────────────
+# -- Copy helpers -----------------------------------------------------------
 function Copy-Skill {
   param([string]$Source, [string]$Name, [string]$DestRoot)
   $dest = Join-Path $DestRoot $Name
@@ -119,16 +122,73 @@ function Normalize-Skill {
   Set-Content -NoNewline -Encoding UTF8 -LiteralPath $md -Value $content
 }
 
+function Test-FullSha {
+  param([string]$Value)
+  return $Value -match "^[0-9a-fA-F]{40}$"
+}
+
+function Get-PinnedCommit {
+  param([string]$Repo)
+  $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
+  $manifestPath = Join-Path $repoRoot "curated-skills.json"
+  $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+  $entry = @($manifest.upstreamSkills | Where-Object { $_.repo -eq $Repo } | Select-Object -First 1)
+
+  if (-not $entry) {
+    throw "Missing upstream repo in curated-skills.json: $Repo"
+  }
+
+  $commit = [string]$entry.commit
+  if (-not $commit) {
+    throw "Missing pinned commit in curated-skills.json for $Repo"
+  }
+
+  return $commit
+}
+
+function Invoke-Git {
+  param([string[]]$Arguments)
+  $output = & git @Arguments 2>&1
+  if ($LASTEXITCODE -ne 0) {
+    $message = ($output | Out-String).Trim()
+    if (-not $message) { $message = "git $($Arguments -join ' ') failed" }
+    throw $message
+  }
+  return $output
+}
+
 function Install-FromRepo {
   param([string]$Repo, [string[]]$Paths, [string]$DestRoot)
+  $pinnedCommit = Get-PinnedCommit -Repo $Repo
+  if (-not (Test-FullSha $pinnedCommit)) {
+    throw "Refusing to install ${Repo}: curated-skills.json commit must be a full 40-character SHA, got '$pinnedCommit'."
+  }
+
+  if ($DryRun) {
+    Write-Host "  pin   $Repo@$pinnedCommit"
+    foreach ($path in $Paths) {
+      $name = Split-Path $path -Leaf
+      Write-Host "  dry   $name -> $(Join-Path $DestRoot $name)"
+    }
+    return
+  }
+
   $temp = Join-Path ([System.IO.Path]::GetTempPath()) ("ead-skills-" + [Guid]::NewGuid().ToString("N"))
-  Write-Host "  cloning $Repo..."
-  git clone --depth 1 "https://github.com/$Repo.git" $temp 2>&1 | Out-Null
+  Write-Host "  fetching $Repo@$pinnedCommit..."
   try {
+    Invoke-Git -Arguments @("init", "-q", $temp) | Out-Null
+    Invoke-Git -Arguments @("-C", $temp, "remote", "add", "origin", "https://github.com/$Repo.git") | Out-Null
+    Invoke-Git -Arguments @("-C", $temp, "fetch", "-q", "--depth", "1", "origin", $pinnedCommit) | Out-Null
+    Invoke-Git -Arguments @("-C", $temp, "checkout", "-q", "--detach", $pinnedCommit) | Out-Null
+    $checkedCommit = (Invoke-Git -Arguments @("-C", $temp, "rev-parse", "HEAD") | Out-String).Trim()
+    if ($checkedCommit -ne $pinnedCommit) {
+      throw "Pinned checkout verification failed for ${Repo}: expected $pinnedCommit, got $checkedCommit"
+    }
+
     foreach ($path in $Paths) {
       $source = Join-Path $temp $path
       if (-not (Test-Path $source)) {
-        Write-Warning "  Path not found in ${Repo}: $path — skipping"
+        Write-Warning "  Path not found in ${Repo}: $path - skipping"
         continue
       }
       $name = Split-Path $path -Leaf
@@ -140,7 +200,7 @@ function Install-FromRepo {
   }
 }
 
-# ── Main ────────────────────────────────────────────────────────────────────
+# -- Main -------------------------------------------------------------------
 $repoRoot  = Resolve-Path (Join-Path $PSScriptRoot "..")
 $destRoots = Resolve-SkillsDirs $Target
 
@@ -148,13 +208,13 @@ Write-Host ""
 Write-Host "enterprise-ai-dev-skills installer"
 Write-Host "  Mode   : $Mode"
 Write-Host "  Target : $($Target -join ', ')"
-if ($DryRun) { Write-Host "  DRY RUN — no files will be written" }
+if ($DryRun) { Write-Host "  DRY RUN - no files will be written" }
 Write-Host ""
 
 foreach ($dest in $destRoots) {
   New-Item -ItemType Directory -Force -Path $dest.Path | Out-Null
 
-  # ── Conflict report ──────────────────────────────────────────────────────
+  # -- Conflict report ------------------------------------------------------
   $allSkillNames = $LocalSkillsByMode[$Mode] + ($UpstreamByMode[$Mode].Values | ForEach-Object { $_ | ForEach-Object { Split-Path $_ -Leaf } })
   $skillConflicts = Get-ConflictReport -DestRoot $dest.Path -IncomingSkills $allSkillNames
   if ($skillConflicts.Count -gt 0) {
@@ -163,20 +223,20 @@ foreach ($dest in $destRoots) {
     Write-Host ""
   }
 
-  # ── Local skills ─────────────────────────────────────────────────────────
-  Write-Host "[$($dest.Target)] Installing local skills ($Mode mode)..."
+  # -- Local skills ---------------------------------------------------------
+  Write-Host "[$($dest.Target)] Installing local skills..."
   foreach ($skillName in $LocalSkillsByMode[$Mode]) {
     $source = Join-Path $repoRoot "skills\$skillName"
     if (-not (Test-Path $source)) {
-      Write-Warning "  Local skill not found: $skillName — skipping"
+      Write-Warning "  Local skill not found: $skillName - skipping"
       continue
     }
     Copy-Skill -Source $source -Name $skillName -DestRoot $dest.Path
   }
 
-  # ── Upstream skills ──────────────────────────────────────────────────────
+  # -- Upstream skills ------------------------------------------------------
   Write-Host ""
-  Write-Host "[$($dest.Target)] Installing upstream skills ($Mode mode)..."
+  Write-Host "[$($dest.Target)] Installing upstream skills..."
   foreach ($repo in $UpstreamByMode[$Mode].Keys) {
     $paths = $UpstreamByMode[$Mode][$repo]
     if ($paths.Count -gt 0) {
