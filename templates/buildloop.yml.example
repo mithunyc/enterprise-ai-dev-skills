@@ -1,0 +1,83 @@
+# .buildloop.yml — Enterprise AI Dev Control Plane Configuration
+#
+# Place this file at your repo root as .buildloop.yml
+# The gate-runner reads this to execute your quality gates.
+#
+# [CUSTOMIZE] Replace all placeholder values for your project.
+# Remove or comment out commands that do not apply.
+
+# -------------------------------------------------------------------
+# ADOPTION MODE
+# -------------------------------------------------------------------
+adoption_mode: greenfield   # greenfield | brownfield | autonomous
+#
+# greenfield  — New project. No stabilization required before features.
+# brownfield  — Existing project. Full diagnostic (diagnostic-baseline.md) required first.
+# autonomous  — Gate-runner loops, picking up the next incomplete story each iteration.
+
+# -------------------------------------------------------------------
+# RISK LEVEL
+# -------------------------------------------------------------------
+risk_level: medium          # low | medium | high
+#
+# low    — No auth, payments, migrations, or infra changes.
+# medium — Some integration, or changes to shared contracts.
+# high   — Auth, payments, PII, migrations, secrets, deploys, or infra.
+
+# -------------------------------------------------------------------
+# QUALITY GATE COMMANDS
+# -------------------------------------------------------------------
+# gate-runner executes each command in order.
+# All commands must exit 0 for PASS. Any non-zero exit = FAIL.
+# [CUSTOMIZE] Replace placeholders with your actual commands.
+
+commands:
+  lint: "[YOUR_LINT_COMMAND]"
+  # Examples:
+  # lint: "npm run lint"
+  # lint: "ruff check ."
+  # lint: "golangci-lint run ./..."
+  # lint: "cargo clippy -- -D warnings"
+
+  typecheck: "[YOUR_TYPECHECK_COMMAND]"
+  # Examples:
+  # typecheck: "npx tsc --noEmit"
+  # typecheck: "mypy ."
+  # typecheck: "n/a"  # use this if your language has no separate typecheck step
+
+  test: "[YOUR_TEST_COMMAND]"
+  # Examples:
+  # test: "npm test"
+  # test: "pytest"
+  # test: "go test ./..."
+  # test: "cargo test"
+
+  build: "[YOUR_BUILD_COMMAND]"
+  # Examples:
+  # build: "npm run build"
+  # build: "cargo build --release"
+  # build: "go build ./..."
+  # build: "docker build -t myapp ."
+
+# -------------------------------------------------------------------
+# PROTECTED PATHS
+# -------------------------------------------------------------------
+# gate-runner checks `git diff --name-only` against these patterns.
+# If any protected path appears in the diff without explicit approval,
+# the gate fails and reports a violation.
+# [CUSTOMIZE] Add your project-specific protected paths.
+
+protected_paths:
+  - ".env*"
+  - "**/*.key"
+  - "**/*.pem"
+  - "**/*.p12"
+  - ".github/workflows/**"
+  # [CUSTOMIZE] Uncomment and adapt as needed:
+  # - "supabase/migrations/**"
+  # - "infra/**"
+  # - "terraform/**"
+  # - "k8s/**"
+  # - "helm/**"
+  # - "secrets/**"
+  # - "certs/**"

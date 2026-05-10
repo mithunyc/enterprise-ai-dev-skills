@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AdversarialReview",
+  "description": "Validates the YAML frontmatter of templates/adversarial-review.md",
+  "type": "object",
+  "required": ["type", "verdict", "critical_count", "high_count"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["adversarial-review"],
+      "description": "Must be 'adversarial-review'"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["GO", "CONDITIONAL_GO", "NO_GO"],
+      "description": "Reviewer's final recommendation"
+    },
+    "critical_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of critical findings. GO requires 0 critical."
+    },
+    "high_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of high-severity findings. GO requires 0 high."
+    }
+  },
+  "additionalProperties": false
+}

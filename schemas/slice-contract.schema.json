@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SliceContract",
+  "description": "Validates the YAML frontmatter of templates/slice-contract.md",
+  "type": "object",
+  "required": ["type", "story", "allowed_files", "blast_radius", "rollback", "depends_on", "evidence_required"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["slice-contract"],
+      "description": "Must be 'slice-contract'"
+    },
+    "story": {
+      "type": "string",
+      "description": "Story ID and title — e.g. 'US-001: Add candidate CRUD'"
+    },
+    "allowed_files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Complete list of files this slice is allowed to touch — agent must not modify files outside this list"
+    },
+    "blast_radius": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH"],
+      "description": "LOW=≤5 files/isolated, MEDIUM=6-15 files/1-2 layers, HIGH=15+/migrations/auth"
+    },
+    "rollback": {
+      "type": "string",
+      "description": "Exact git command or step to undo this slice"
+    },
+    "depends_on": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of story IDs or phase names that must be complete before this slice starts"
+    },
+    "evidence_required": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "List of commands or checks that must pass before marking this slice DONE"
+    }
+  },
+  "additionalProperties": false
+}

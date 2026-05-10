@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DiagnosticBaseline",
+  "description": "Validates the YAML frontmatter of templates/diagnostic-baseline.md",
+  "type": "object",
+  "required": ["type", "repo_state", "health", "stabilization_required"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["diagnostic-baseline"],
+      "description": "Must be 'diagnostic-baseline'"
+    },
+    "repo_state": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D"],
+      "description": "A=new/empty, B=existing/unmanaged, C=existing/governed, D=existing/mixed"
+    },
+    "health": {
+      "type": "object",
+      "required": ["install", "tests", "lint", "typecheck", "ci", "build"],
+      "properties": {
+        "install": { "type": "string", "enum": ["ok", "warn", "fail", "unknown"] },
+        "tests":   { "type": "string", "enum": ["ok", "warn", "fail", "unknown", "none"] },
+        "lint":    { "type": "string", "enum": ["ok", "warn", "fail", "unknown"] },
+        "typecheck": { "type": "string", "enum": ["ok", "warn", "fail", "unknown", "n/a"] },
+        "ci":      { "type": "string", "enum": ["ok", "warn", "fail", "unknown", "n/a"] },
+        "build":   { "type": "string", "enum": ["ok", "warn", "fail", "unknown"] }
+      },
+      "additionalProperties": false
+    },
+    "stabilization_required": {
+      "type": "boolean",
+      "description": "If true, feature work is blocked until foundation is verified"
+    }
+  },
+  "additionalProperties": false
+}

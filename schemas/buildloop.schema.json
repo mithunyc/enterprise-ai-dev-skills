@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BuildloopConfig",
+  "description": "Validates a .buildloop.yml configuration file",
+  "type": "object",
+  "required": ["adoption_mode", "risk_level", "commands", "protected_paths"],
+  "properties": {
+    "adoption_mode": {
+      "type": "string",
+      "enum": ["greenfield", "brownfield", "autonomous"],
+      "description": "greenfield=new project, brownfield=existing/unmanaged, autonomous=gate-runner loops"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "low=no auth/migrations, medium=shared contracts, high=auth/payments/infra"
+    },
+    "commands": {
+      "type": "object",
+      "required": ["lint", "typecheck", "test", "build"],
+      "properties": {
+        "lint":      { "type": "string", "description": "Lint command — must exit 0 to pass" },
+        "typecheck": { "type": "string", "description": "Typecheck command — use 'n/a' if not applicable" },
+        "test":      { "type": "string", "description": "Test command — must exit 0 to pass" },
+        "build":     { "type": "string", "description": "Build command — must exit 0 to pass" }
+      },
+      "additionalProperties": false
+    },
+    "protected_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Glob patterns for paths that must not appear in git diff without explicit approval"
+    }
+  },
+  "additionalProperties": false
+}
