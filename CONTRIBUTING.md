@@ -1,4 +1,4 @@
-# Contributing to enterprise-ai-dev-skills
+# Contributing to buildloop
 
 Thank you for contributing. This repo ships agent governance — everything must be deterministic, generalized, and verified.
 
@@ -226,4 +226,4 @@ When adding a new skill to the curated registry, follow the existing tier struct
 
 ---
 
-*Source: enterprise-ai-dev-skills/CONTRIBUTING.md | Upstream: write-a-skill/SKILL.md*
+*Source: buildloop/CONTRIBUTING.md | Upstream: write-a-skill/SKILL.md*

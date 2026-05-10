@@ -91,4 +91,4 @@ If approved, next action: [explicit step]
 
 ---
 
-*Source: enterprise-ai-dev-skills/templates/phase-proposal.md | Upstream: AGENTS_v3.3 §10*
+*Source: buildloop/templates/phase-proposal.md | Upstream: AGENTS_v3.3 §10*

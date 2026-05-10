@@ -205,7 +205,7 @@ $repoRoot  = Resolve-Path (Join-Path $PSScriptRoot "..")
 $destRoots = Resolve-SkillsDirs $Target
 
 Write-Host ""
-Write-Host "enterprise-ai-dev-skills installer"
+Write-Host "buildloop installer"
 Write-Host "  Mode   : $Mode"
 Write-Host "  Target : $($Target -join ', ')"
 if ($DryRun) { Write-Host "  DRY RUN - no files will be written" }

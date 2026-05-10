@@ -1,6 +1,6 @@
-# AGENTS.md - enterprise-ai-dev-skills Governance
+# AGENTS.md - buildloop Governance
 
-This repository builds and maintains `enterprise-ai-dev-skills`: a small, public skill distribution for evidence-based AI software delivery. Treat this repo as the product and dogfood its own rules.
+This repository builds and maintains `buildloop`: a small, public skill distribution for evidence-based AI software delivery. Treat this repo as the product and dogfood its own rules.
 
 ## Authority Order
 

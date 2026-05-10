@@ -2,7 +2,7 @@
   "name": "acme-widget-app",
   "version": "1.0.0",
   "type": "module",
-  "description": "Acme Widget App — brownfield diagnostic fixture for enterprise-ai-dev-skills",
+  "description": "Acme Widget App — brownfield diagnostic fixture for buildloop",
   "scripts": {
     "test": "node test.mjs"
   },

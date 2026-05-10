@@ -203,4 +203,4 @@ SYSTEM HEALTH: [one sentence assessment]
 
 ---
 
-*Source: enterprise-ai-dev-skills/playbooks/system-optimization.md*
+*Source: buildloop/playbooks/system-optimization.md*

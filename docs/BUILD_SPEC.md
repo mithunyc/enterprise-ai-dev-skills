@@ -1,8 +1,8 @@
-# BUILD SPEC — Enterprise-AI-Dev-Skills Repository
+# BUILD SPEC — buildloop Repository
 ## Agent-Executable Task Graph
 
-**Repo:** `C:\Users\mshmi\OneDrive\Apps\enterprise-ai-dev-skills`
-**Remote:** `https://github.com/mithunyc/enterprise-ai-dev-skills`
+**Repo:** `C:\Users\mshmi\OneDrive\Apps\buildloop`
+**Remote:** `https://github.com/mithunyc/buildloop`
 **Strategy:** Keep existing repo. Evolve, don't replace. Preserve git history.
 **Phase 0:** ✅ COMPLETE — see `tasks/STATE.md` for evidence
 

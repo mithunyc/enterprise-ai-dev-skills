@@ -1,8 +1,8 @@
 # PROJECT STATE
 
-**Repo:** enterprise-ai-dev-skills
-**Remote:** https://github.com/mithunyc/enterprise-ai-dev-skills
-**Local:** C:\Users\mshmi\OneDrive\Apps\enterprise-ai-dev-skills
+**Repo:** buildloop
+**Remote:** https://github.com/mithunyc/buildloop
+**Local:** C:\Users\mshmi\OneDrive\Apps\buildloop
 **Last Updated:** 2026-05-10T08:45:00Z
 
 ---

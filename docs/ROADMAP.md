@@ -1,4 +1,4 @@
-# ULTIMATE ROADMAP v5.0 — Enterprise-AI-Dev Control Plane
+# ULTIMATE ROADMAP v5.0 — Buildloop Control Plane
 
 **Status:** CONDITIONAL GO — becomes UNCONDITIONAL after Phase 2 dogfooding on:
 1. This repo itself

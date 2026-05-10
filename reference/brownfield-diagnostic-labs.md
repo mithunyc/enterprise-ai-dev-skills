@@ -264,4 +264,4 @@ Once the manifest exists and is approved:
 
 ---
 
-*Source: enterprise-ai-dev-skills/reference/brownfield-diagnostic-labs.md | Upstream: Phase 1.6 Bootstrap Compiler*
+*Source: buildloop/reference/brownfield-diagnostic-labs.md | Upstream: Phase 1.6 Bootstrap Compiler*

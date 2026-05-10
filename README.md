@@ -1,8 +1,8 @@
-# Enterprise AI Dev Skills
+# Buildloop
 
-[![CI](https://github.com/mithunyc/enterprise-ai-dev-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/mithunyc/enterprise-ai-dev-skills/actions/workflows/ci.yml)
+[![CI](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml/badge.svg)](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.0.0-green.svg)](https://github.com/mithunyc/enterprise-ai-dev-skills/releases/tag/v2.0.0)
+[![Version](https://img.shields.io/badge/version-v2.0.0-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.0)
 
 **Spec-to-production control plane for AI-assisted software delivery.**
 
@@ -27,27 +27,27 @@ Restart your AI coding agent after installing.
 
 **OpenAI Codex**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.sh | bash -s -- --target codex
+curl -fsSL https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.sh | bash -s -- --target codex
 ```
 
 **Claude Code**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.sh | bash -s -- --target claude
+curl -fsSL https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.sh | bash -s -- --target claude
 ```
 
 **Cursor**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.sh | bash -s -- --target cursor
+curl -fsSL https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.sh | bash -s -- --target cursor
 ```
 
 **Google Antigravity**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.sh | bash -s -- --target antigravity
+curl -fsSL https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.sh | bash -s -- --target antigravity
 ```
 
 **All agents at once**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.sh | bash -s -- --target all
+curl -fsSL https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.sh | bash -s -- --target all
 ```
 
 ---
@@ -56,27 +56,27 @@ curl -fsSL https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/m
 
 **OpenAI Codex**
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.ps1' -OutFile $p; & $p -Target codex"
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.ps1' -OutFile $p; & $p -Target codex"
 ```
 
 **Claude Code**
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.ps1' -OutFile $p; & $p -Target claude"
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.ps1' -OutFile $p; & $p -Target claude"
 ```
 
 **Cursor**
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.ps1' -OutFile $p; & $p -Target cursor"
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.ps1' -OutFile $p; & $p -Target cursor"
 ```
 
 **Google Antigravity**
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.ps1' -OutFile $p; & $p -Target antigravity"
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.ps1' -OutFile $p; & $p -Target antigravity"
 ```
 
 **All agents at once**
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/enterprise-ai-dev-skills/main/scripts/install.ps1' -OutFile $p; & $p -Target all"
+powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1'; Invoke-WebRequest 'https://raw.githubusercontent.com/mithunyc/buildloop/main/scripts/install.ps1' -OutFile $p; & $p -Target all"
 ```
 
 ---
@@ -97,14 +97,14 @@ powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1
 ## Prefer Inspecting First?
 
 ```bash
-git clone https://github.com/mithunyc/enterprise-ai-dev-skills.git
-cd enterprise-ai-dev-skills
+git clone https://github.com/mithunyc/buildloop.git
+cd buildloop
 bash scripts/install.sh --target codex          # macOS / Linux
 ```
 
 ```powershell
-git clone https://github.com/mithunyc/enterprise-ai-dev-skills.git
-cd enterprise-ai-dev-skills
+git clone https://github.com/mithunyc/buildloop.git
+cd buildloop
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Target codex   # Windows
 ```
 

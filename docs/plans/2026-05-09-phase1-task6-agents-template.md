@@ -9,7 +9,7 @@
 **Tech Stack:** Markdown with YAML frontmatter
 
 **Source:** `C:\Users\mshmi\OneDrive\Apps\enterprisegradesoftwireos\AGENTS_v3_3.md`
-**Target:** `C:\Users\mshmi\OneDrive\Apps\enterprise-ai-dev-skills\templates\AGENTS.template.md`
+**Target:** `C:\Users\mshmi\OneDrive\Apps\buildloop\templates\AGENTS.template.md`
 
 ---
 
@@ -21,7 +21,7 @@
 - [ ] **Step 1: Create directory and empty file**
 
 ```powershell
-Set-Location "C:\Users\mshmi\OneDrive\Apps\enterprise-ai-dev-skills"
+Set-Location "C:\Users\mshmi\OneDrive\Apps\buildloop"
 New-Item -ItemType Directory -Path templates -Force
 New-Item -ItemType File -Path templates\AGENTS.template.md
 ```
@@ -47,7 +47,7 @@ Write this content to `templates/AGENTS.template.md`:
 
 ```markdown
 # AGENTS.md — Agent Operating Protocol
-<!-- Generated from Enterprise-AI-Dev-Skills template v2.0 -->
+<!-- Generated from buildloop template v2.0 -->
 <!-- [CUSTOMIZE] markers indicate sections you must edit for your project -->
 
 ---
@@ -233,7 +233,7 @@ Expected: At least 3 matches.
 - [ ] **Step 5: Commit**
 
 ```powershell
-Set-Location "C:\Users\mshmi\OneDrive\Apps\enterprise-ai-dev-skills"
+Set-Location "C:\Users\mshmi\OneDrive\Apps\buildloop"
 git add templates/AGENTS.template.md
 git commit -m "phase-1: task-6 AGENTS.template.md — generalized agent protocol template"
 ```

@@ -2,7 +2,7 @@
 
 Source: docs/ROADMAP.md (this repo), AGENTS_v3.3 §6.4
 
-This document governs how to safely adopt the enterprise-ai-dev-skills control plane
+This document governs how to safely adopt the buildloop control plane
 on an existing project without breaking what already works.
 
 ---
@@ -138,4 +138,4 @@ Never silently pick one instruction over another at the same authority level.
 
 ---
 
-*Source: enterprise-ai-dev-skills/reference/brownfield-adoption.md | Upstream: docs/ROADMAP.md, AGENTS_v3.3 §6.4*
+*Source: buildloop/reference/brownfield-adoption.md | Upstream: docs/ROADMAP.md, AGENTS_v3.3 §6.4*

@@ -1,8 +1,8 @@
 {
-  "name": "enterprise-ai-dev-skills",
+  "name": "buildloop",
   "version": "2.0.0",
   "description": "Spec-to-Production Control Plane. Curated skills, templates, and gate scripts for enterprise-grade AI-assisted software delivery.",
-  "repository": "https://github.com/mithunyc/enterprise-ai-dev-skills",
+  "repository": "https://github.com/mithunyc/buildloop",
   "tiers": {
     "minimal": {
       "description": "For context windows <100K or solo developers. ~1.5K token overhead.",

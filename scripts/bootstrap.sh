@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-repo_tar="https://github.com/mithunyc/enterprise-ai-dev-skills/archive/refs/heads/main.tar.gz"
+repo_tar="https://github.com/mithunyc/buildloop/archive/refs/heads/main.tar.gz"
 temp_root="$(mktemp -d)"
 
 cleanup() {
@@ -42,7 +42,7 @@ else
 fi
 
 tar -xzf "$archive" -C "$temp_root"
-repo_root="$(find "$temp_root" -maxdepth 1 -type d -name 'enterprise-ai-dev-skills-*' | head -n 1)"
+repo_root="$(find "$temp_root" -maxdepth 1 -type d -name 'buildloop-*' | head -n 1)"
 [[ -n "$repo_root" ]] || { echo "Could not find extracted repo directory." >&2; exit 1; }
 
 bash "$repo_root/scripts/install.sh" --target "$target" "${force_args[@]}"

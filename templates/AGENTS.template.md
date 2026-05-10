@@ -12,7 +12,7 @@ receipts_dir: "tasks/receipts/"
 ---
 
 # AGENTS.md — Universal Agent Operating Protocol
-# Adapted from AGENTS_v3.3 | See enterprise-ai-dev-skills for the full source
+# Adapted from AGENTS_v3.3 | See buildloop for the full source
 
 > **Quick start:** Read this file, then run the Bootstrap Protocol (§6).
 
@@ -489,4 +489,4 @@ For projects with a machine-readable task list, the agent can operate autonomous
 
 ---
 
-*Source: enterprise-ai-dev-skills/templates/AGENTS.template.md | Upstream: AGENTS_v3.3*
+*Source: buildloop/templates/AGENTS.template.md | Upstream: AGENTS_v3.3*

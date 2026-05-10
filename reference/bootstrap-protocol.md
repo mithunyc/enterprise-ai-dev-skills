@@ -218,4 +218,4 @@ If dirty state → ask: stash / branch / commit / halt.
 
 ---
 
-*Source: enterprise-ai-dev-skills/reference/bootstrap-protocol.md | Upstream: AGENTS_v3.3 §6*
+*Source: buildloop/reference/bootstrap-protocol.md | Upstream: AGENTS_v3.3 §6*

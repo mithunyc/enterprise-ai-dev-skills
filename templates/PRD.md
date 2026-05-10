@@ -116,4 +116,4 @@ Before marking APPROVED, verify:
 
 ---
 
-*Source: enterprise-ai-dev-skills/templates/PRD.md | Upstream: enterprise-ai-dev skill, AGENTS_v3.3 §2*
+*Source: buildloop/templates/PRD.md | Upstream: enterprise-ai-dev skill, AGENTS_v3.3 §2*

@@ -1,6 +1,6 @@
 # Skill Acquisition Playbook
 
-Source: enterprise-ai-dev-skills | Based on the External Skill Acquisition Protocol
+Source: buildloop | Based on the External Skill Acquisition Protocol
 
 **Purpose:** Identify gaps in the agent system and fill them with targeted external skills.
 **Use when:** The system optimization playbook finds ❌ gaps that require multi-step workflow skills.
@@ -199,4 +199,4 @@ SYSTEM HEALTH: [one sentence assessment]
 
 ---
 
-*Source: enterprise-ai-dev-skills/playbooks/skill-acquisition.md*
+*Source: buildloop/playbooks/skill-acquisition.md*

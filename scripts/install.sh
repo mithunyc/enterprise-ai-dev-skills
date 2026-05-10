@@ -260,7 +260,7 @@ install_from_repo() {
 mapfile -t resolved_targets < <(resolve_dest_roots "$TARGETS")
 
 echo
-echo "enterprise-ai-dev-skills installer"
+echo "buildloop installer"
 echo "  Mode   : $MODE"
 echo "  Target : $TARGETS"
 if [[ "$DRY_RUN" == "1" ]]; then echo "  DRY RUN - no files will be written"; fi

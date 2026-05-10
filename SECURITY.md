@@ -68,7 +68,7 @@ You control this list. Add your project's sensitive paths before enabling autono
 
 Use GitHub's built-in private reporting:
 
-1. Go to the [Security tab](https://github.com/mithunyc/enterprise-ai-dev-skills/security) of this repository.
+1. Go to the [Security tab](https://github.com/mithunyc/buildloop/security) of this repository.
 2. Click **"Report a vulnerability"**.
 3. Fill in the details privately. Only maintainers can see this report.
 
@@ -91,7 +91,7 @@ You will receive a response within **5 business days**. If you do not hear back,
 
 ## Reporting a Non-Security Bug
 
-For installer failures, agent compatibility issues, or unexpected behavior — open a standard [GitHub issue](https://github.com/mithunyc/enterprise-ai-dev-skills/issues) with:
+For installer failures, agent compatibility issues, or unexpected behavior — open a standard [GitHub issue](https://github.com/mithunyc/buildloop/issues) with:
 
 - Target agent: Codex, Claude Code, Cursor, or Antigravity.
 - OS and shell.
