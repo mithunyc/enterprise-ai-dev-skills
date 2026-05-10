@@ -3,122 +3,282 @@
   "version": "2.0.0",
   "description": "Spec-to-Production Control Plane. Curated skills, templates, and gate scripts for enterprise-grade AI-assisted software delivery.",
   "repository": "https://github.com/mithunyc/enterprise-ai-dev-skills",
-
   "tiers": {
     "minimal": {
       "description": "For context windows <100K or solo developers. ~1.5K token overhead.",
-      "localSkills": ["enterprise-ai-dev", "karpathy-guidelines"],
-      "upstreamSkills": ["brainstorming", "tdd", "diagnose"]
+      "localSkills": [
+        "enterprise-ai-dev",
+        "karpathy-guidelines"
+      ],
+      "upstreamSkills": [
+        "brainstorming",
+        "tdd",
+        "diagnose"
+      ]
     },
     "core": {
       "description": "Default install. Balanced coverage for most projects. ~3.6K token overhead.",
-      "localSkills": ["enterprise-ai-dev", "karpathy-guidelines", "awesome-design-md", "caveman"],
+      "localSkills": [
+        "enterprise-ai-dev",
+        "karpathy-guidelines",
+        "awesome-design-md",
+        "caveman"
+      ],
       "upstreamSkills": [
-        "brainstorming", "tdd", "diagnose",
-        "writing-plans", "executing-plans", "grill-with-docs",
-        "verification-before-completion", "security-best-practices"
+        "brainstorming",
+        "tdd",
+        "diagnose",
+        "writing-plans",
+        "executing-plans",
+        "grill-with-docs",
+        "verification-before-completion",
+        "security-best-practices"
       ]
     },
     "full": {
       "description": "Opt-in for larger teams and complex projects. ~5.7K token overhead.",
-      "localSkills": ["enterprise-ai-dev", "karpathy-guidelines", "awesome-design-md", "caveman", "grill-me"],
+      "localSkills": [
+        "enterprise-ai-dev",
+        "karpathy-guidelines",
+        "awesome-design-md",
+        "caveman",
+        "grill-me"
+      ],
       "upstreamSkills": [
-        "brainstorming", "tdd", "diagnose",
-        "writing-plans", "executing-plans", "grill-with-docs",
-        "verification-before-completion", "security-best-practices",
-        "triage", "improve-codebase-architecture", "zoom-out",
-        "finishing-a-development-branch", "requesting-code-review",
-        "security-threat-model", "setup-matt-pocock-skills"
+        "brainstorming",
+        "tdd",
+        "diagnose",
+        "writing-plans",
+        "executing-plans",
+        "grill-with-docs",
+        "verification-before-completion",
+        "security-best-practices",
+        "triage",
+        "improve-codebase-architecture",
+        "zoom-out",
+        "finishing-a-development-branch",
+        "requesting-code-review",
+        "security-threat-model",
+        "setup-matt-pocock-skills"
       ]
     },
     "contributor": {
       "description": "For skill authors and repo maintainers. Not auto-installed.",
       "localSkills": [],
-      "upstreamSkills": ["write-a-skill"]
+      "upstreamSkills": [
+        "write-a-skill"
+      ]
     }
   },
-
   "localSkills": [
     {
       "name": "enterprise-ai-dev",
       "path": "skills/enterprise-ai-dev",
-      "tier": ["minimal", "core", "full"],
+      "tier": [
+        "minimal",
+        "core",
+        "full"
+      ],
       "purpose": "Master orchestrator. Greenfield/brownfield/autonomous lifecycle. The entry point for all work."
     },
     {
       "name": "awesome-design-md",
       "path": "skills/awesome-design-md",
-      "tier": ["core", "full"],
+      "tier": [
+        "core",
+        "full"
+      ],
       "purpose": "Curated DESIGN.md references for UI/UX work."
     },
     {
       "name": "caveman",
       "path": "skills/caveman",
-      "tier": ["core", "full"],
+      "tier": [
+        "core",
+        "full"
+      ],
       "purpose": "Ultra-compressed communication mode. ~75% token reduction when context is tight."
     },
     {
       "name": "grill-me",
       "path": "skills/grill-me",
-      "tier": ["full"],
+      "tier": [
+        "full"
+      ],
       "purpose": "Relentless plan stress-test. Used at planning steps to surface ambiguity before code is written."
     },
     {
       "name": "karpathy-guidelines",
       "path": "skills/karpathy-guidelines",
-      "tier": ["minimal", "core", "full"],
+      "tier": [
+        "minimal",
+        "core",
+        "full"
+      ],
       "purpose": "Anti-overcomplication behavioral guard. Applied during all code writing and review."
     }
   ],
-
   "upstreamSkills": [
     {
       "repo": "mattpocock/skills",
-      "commit": "HEAD",
+      "commit": "733d312884b3878a9a9cff693c5886943753a741",
       "verified_date": "2026-05-09",
       "skills": [
-        { "name": "setup-matt-pocock-skills", "path": "skills/engineering/setup-matt-pocock-skills", "tier": ["full"] },
-        { "name": "grill-with-docs",          "path": "skills/engineering/grill-with-docs",          "tier": ["core", "full"] },
-        { "name": "to-prd",                   "path": "skills/engineering/to-prd",                   "tier": ["core", "full"] },
-        { "name": "tdd",                      "path": "skills/engineering/tdd",                      "tier": ["minimal", "core", "full"] },
-        { "name": "diagnose",                 "path": "skills/engineering/diagnose",                 "tier": ["minimal", "core", "full"] },
-        { "name": "improve-codebase-architecture", "path": "skills/engineering/improve-codebase-architecture", "tier": ["full"] },
-        { "name": "zoom-out",                 "path": "skills/engineering/zoom-out",                 "tier": ["full"] }
+        {
+          "name": "setup-matt-pocock-skills",
+          "path": "skills/engineering/setup-matt-pocock-skills",
+          "tier": [
+            "full"
+          ]
+        },
+        {
+          "name": "grill-with-docs",
+          "path": "skills/engineering/grill-with-docs",
+          "tier": [
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "to-prd",
+          "path": "skills/engineering/to-prd",
+          "tier": [
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "tdd",
+          "path": "skills/engineering/tdd",
+          "tier": [
+            "minimal",
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "diagnose",
+          "path": "skills/engineering/diagnose",
+          "tier": [
+            "minimal",
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "improve-codebase-architecture",
+          "path": "skills/engineering/improve-codebase-architecture",
+          "tier": [
+            "full"
+          ]
+        },
+        {
+          "name": "zoom-out",
+          "path": "skills/engineering/zoom-out",
+          "tier": [
+            "full"
+          ]
+        }
       ]
     },
     {
       "repo": "obra/superpowers",
-      "commit": "HEAD",
+      "commit": "f2cbfbefebbfef77321e4c9abc9e949826bea9d7",
       "verified_date": "2026-05-09",
       "skills": [
-        { "name": "brainstorming",                  "path": "skills/brainstorming",                  "tier": ["minimal", "core", "full"] },
-        { "name": "writing-plans",                  "path": "skills/writing-plans",                  "tier": ["core", "full"] },
-        { "name": "executing-plans",                "path": "skills/executing-plans",                "tier": ["core", "full"] },
-        { "name": "requesting-code-review",         "path": "skills/requesting-code-review",         "tier": ["full"] },
-        { "name": "verification-before-completion", "path": "skills/verification-before-completion", "tier": ["core", "full"] },
-        { "name": "finishing-a-development-branch", "path": "skills/finishing-a-development-branch", "tier": ["full"] }
+        {
+          "name": "brainstorming",
+          "path": "skills/brainstorming",
+          "tier": [
+            "minimal",
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "writing-plans",
+          "path": "skills/writing-plans",
+          "tier": [
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "executing-plans",
+          "path": "skills/executing-plans",
+          "tier": [
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "requesting-code-review",
+          "path": "skills/requesting-code-review",
+          "tier": [
+            "full"
+          ]
+        },
+        {
+          "name": "verification-before-completion",
+          "path": "skills/verification-before-completion",
+          "tier": [
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "finishing-a-development-branch",
+          "path": "skills/finishing-a-development-branch",
+          "tier": [
+            "full"
+          ]
+        }
       ],
       "removed": [
-        { "name": "test-driven-development", "reason": "Replaced by 'tdd' from mattpocock — more structured and purpose-built." },
-        { "name": "systematic-debugging",    "reason": "Replaced by 'diagnose' from mattpocock — more rigorous." }
+        {
+          "name": "test-driven-development",
+          "reason": "Replaced by 'tdd' from mattpocock — more structured and purpose-built."
+        },
+        {
+          "name": "systematic-debugging",
+          "reason": "Replaced by 'diagnose' from mattpocock — more rigorous."
+        }
       ]
     },
     {
       "repo": "openai/skills",
-      "commit": "HEAD",
+      "commit": "4c4058ebf44f6734e62c70ab4a81246d4d093fc8",
       "verified_date": "2026-05-09",
       "skills": [
-        { "name": "security-best-practices", "path": "skills/.curated/security-best-practices", "tier": ["core", "full"] },
-        { "name": "security-threat-model",   "path": "skills/.curated/security-threat-model",   "tier": ["full"] }
+        {
+          "name": "security-best-practices",
+          "path": "skills/.curated/security-best-practices",
+          "tier": [
+            "core",
+            "full"
+          ]
+        },
+        {
+          "name": "security-threat-model",
+          "path": "skills/.curated/security-threat-model",
+          "tier": [
+            "full"
+          ]
+        }
       ]
     }
   ],
-
   "removed": [
-    { "repo": "Yeachan-Heo/oh-my-codex", "skills": ["security-review", "frontend-ui-ux", "visual-verdict"],
-      "reason": "Replaced: security-review→security-best-practices (more rigorous), frontend-ui-ux→awesome-design-md (curated), visual-verdict→low value vs proper Playwright visual regression." }
+    {
+      "repo": "Yeachan-Heo/oh-my-codex",
+      "skills": [
+        "security-review",
+        "frontend-ui-ux",
+        "visual-verdict"
+      ],
+      "reason": "Replaced: security-review→security-best-practices (more rigorous), frontend-ui-ux→awesome-design-md (curated), visual-verdict→low value vs proper Playwright visual regression."
+    }
   ],
-
   "supplyChain": {
     "pinningPolicy": "Upstream repos should be pinned to verified commit SHAs in production installs. Set 'commit' to a full SHA when releasing. Current 'HEAD' values are for development only.",
     "auditScript": "scripts/audit-upstream.mjs",
