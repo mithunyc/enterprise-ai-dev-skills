@@ -112,13 +112,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Target codex   #
 
 ## Skill Tiers
 
-Choose the tier that matches your project complexity. The installer prompts you to select a tier.
+Choose the tier that matches your project complexity. The default install mode is `core`; pass `--mode minimal`, `--mode core`, `--mode full`, or `--mode contributor` when you want a different tier.
 
 | Tier | Skills | Best For |
 |------|--------|----------|
 | **MINIMAL** | `enterprise-ai-dev`, `karpathy-guidelines`, `brainstorming`, `tdd`, `diagnose` — **5 skills** | Solo developers, small context windows, simple projects |
 | **CORE** | Everything in MINIMAL + `awesome-design-md`, `caveman`, `writing-plans`, `executing-plans`, `grill-with-docs`, `verification-before-completion`, `security-best-practices` — **12 skills** | Default. Covers 80% of projects. |
-| **FULL** | Everything in CORE + `grill-me`, `triage`, `improve-codebase-architecture`, `zoom-out`, `finishing-a-development-branch`, `requesting-code-review`, `security-threat-model`, `setup-matt-pocock-skills` — **20 skills** | Teams, complex projects, full audit trail |
+| **FULL** | Everything in CORE + `grill-me`, `triage`, `improve-codebase-architecture`, `zoom-out`, `finishing-a-development-branch`, `requesting-code-review`, `security-threat-model`, `setup-matt-pocock-skills` — **20 skills** | Teams, complex projects, full review and release discipline |
 | **CONTRIBUTOR** | `write-a-skill` — for skill authors | Writing or publishing new skills |
 
 Tier counts are derived from [`curated-skills.json`](curated-skills.json) and validated by CI.
@@ -132,6 +132,8 @@ Start a fresh agent session and use this exact prompt:
 ```text
 Use enterprise-ai-dev as my master CTO orchestrator for this repo.
 ```
+
+Buildloop currently installs the main orchestrator skill under the canonical skill name `enterprise-ai-dev` for compatibility with existing agent skill discovery.
 
 If the agent does not see the skill, restart the app. If it still does not respond correctly, install to the project-local skills directory for that agent.
 
@@ -178,13 +180,12 @@ playbooks/          System optimization and skill acquisition playbooks
 scripts/            gate-runner.mjs, validate-manifest.mjs, audit-upstream.mjs, installers
 examples/           Working greenfield and brownfield fixture walkthroughs
 tests/              install.test.mjs — validates the whole distribution on every CI run
-docs/               ROADMAP.md, BUILD_SPEC.md
 curated-skills.json Upstream skill registry with pinned commit SHAs
 ```
 
 ---
 
-## What's New in v2.0.0
+## What's New in v2.x
 
 - **`enterprise-ai-dev` orchestrator** — greenfield, brownfield, governed, and autonomous profiles; claim labels (FACT / INFERENCE / JUDGMENT / UNVERIFIED); delegation rules.
 - **Templates** — PRD, slice contracts, evidence receipts, adversarial review, diagnostic baseline, handoff, AGENTS.md template.

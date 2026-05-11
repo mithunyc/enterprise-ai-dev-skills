@@ -5,3 +5,7 @@ Thumbs.db
 .cache/
 node_modules/
 audits/
+docs/
+tasks/
+scratch/
+.buildloop-runs/

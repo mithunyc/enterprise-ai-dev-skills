@@ -162,23 +162,27 @@ check('external_memory.obsidian.advisory_only is true', () => {
   }
 });
 
-// --- Test 4: No private project names ---
+// --- Test 4: No machine-local paths ---
 console.log('\n📋 Privacy check:');
 
-check('No private project names in schema', () => {
-  const raw = readFileSync(SCHEMA_PATH, 'utf8');
-  const banned = ['Arkaan', 'UnionForge', 'PowerSync', 'Supabase', 'SPRINT-ZERO', 'GodMode'];
-  for (const word of banned) {
-    assert.ok(!raw.includes(word), `Schema contains banned word: ${word}`);
+function assertNoMachineLocalPaths(label, raw) {
+  const patterns = [
+    { name: 'Windows user profile path', regex: /[A-Z]:\\Users\\/i },
+    { name: 'Unix/macOS user home path', regex: /\/Users\/[^/\s]+/i },
+    { name: 'home directory path', regex: /\/home\/[^/\s]+/i },
+  ];
+
+  for (const pattern of patterns) {
+    assert.ok(!pattern.regex.test(raw), `${label} contains ${pattern.name}`);
   }
+}
+
+check('No machine-local paths in schema', () => {
+  assertNoMachineLocalPaths('Schema', readFileSync(SCHEMA_PATH, 'utf8'));
 });
 
-check('No private project names in example', () => {
-  const raw = readFileSync(EXAMPLE_PATH, 'utf8');
-  const banned = ['Arkaan', 'UnionForge', 'PowerSync', 'Supabase', 'SPRINT-ZERO', 'GodMode'];
-  for (const word of banned) {
-    assert.ok(!raw.includes(word), `Example contains banned word: ${word}`);
-  }
+check('No machine-local paths in example', () => {
+  assertNoMachineLocalPaths('Example', readFileSync(EXAMPLE_PATH, 'utf8'));
 });
 
 // --- Summary ---

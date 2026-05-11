@@ -5,10 +5,10 @@ This repository builds and maintains `buildloop`: a small, public skill distribu
 ## Authority Order
 
 1. Current repo truth: files, `git status`, latest commit, and command output.
-2. Product plan and build contract: `docs/BUILD_SPEC.md` and `docs/ROADMAP.md`.
-3. Current project state: `tasks/STATE.md`.
-4. Templates and examples, including `templates/`, as contribution standards.
-5. Prior notes, memory, or external summaries only when verified against this repo.
+2. Public product docs: `README.md`, `SECURITY.md`, and `CONTRIBUTING.md`.
+3. Distribution contracts: `curated-skills.json`, `scripts/`, `schemas/`, and `tests/`.
+4. Templates, examples, playbooks, and reference docs intended for public users.
+5. Prior notes, memory, local state, or external summaries only when verified against this repo.
 
 If authorities conflict, stop and report the conflict. Do not smooth it over.
 
@@ -18,10 +18,9 @@ Before conclusions or edits:
 
 1. Read this `AGENTS.md`.
 2. Run `git status --short`, `git branch --show-current`, and `git log -1 --oneline`.
-3. Read `tasks/STATE.md`.
-4. Read `docs/ROADMAP.md` and the current phase in `docs/BUILD_SPEC.md`.
-5. Inspect the relevant files before editing them.
-6. State assumptions, scope, plan, verification commands, and rollback.
+3. Read `README.md`, `SECURITY.md`, and `CONTRIBUTING.md` when the task affects public usage.
+4. Inspect the relevant files before editing them.
+5. State assumptions, scope, plan, verification commands, and rollback.
 
 ## Scope Rules
 
@@ -34,7 +33,7 @@ Before conclusions or edits:
 ## Public Surface Rules
 
 - This is a public-facing repo. Keep docs, templates, examples, and scripts safe to publish.
-- Do not publish internal audits, private scratch docs, secrets, customer data, or machine-local evidence unless intentionally product-facing.
+- Do not publish internal audits, local task state, private scratch docs, secrets, customer data, or machine-local evidence.
 - Keep generated artifacts out of the public tree unless they are part of the product contract.
 - Use generalized examples. Do not leak private project names or implementation details.
 

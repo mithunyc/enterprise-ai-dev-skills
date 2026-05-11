@@ -80,7 +80,7 @@ The bad example gives the agent no way to distinguish this from other skills.
 3. **Generalize** — the skill must work on any stack:
    - No hardcoded tool names (use `[YOUR_LINT_COMMAND]` or list examples)
    - No project-specific paths
-   - No references to Arkaan, Supabase, pnpm, or any other specific project
+   - No private project names, customer names, local machine paths, or stack-specific assumptions unless explicitly marked `[CUSTOMIZE]`
 
 4. **Review checklist** — before submitting:
 
