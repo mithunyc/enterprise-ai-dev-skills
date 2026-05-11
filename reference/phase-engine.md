@@ -1,6 +1,6 @@
 # Phase Engine
 
-> Extracted and generalized from AGENTS_v3.3 §10, §10.2, §10.3. Stack-agnostic reference for the enterprise-ai-dev skill.
+> Buildloop public reference for planning and executing work in governed phases.
 
 ---
 
@@ -133,4 +133,4 @@ This exists because horizontal slices hide integration bugs until the end.
 
 ---
 
-*Source: AGENTS_v3.3 §10, §10.2, §10.3*
+*Source: buildloop/reference/phase-engine.md*

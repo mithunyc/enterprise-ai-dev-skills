@@ -1,6 +1,6 @@
 # Architecture Boundaries
 
-> Extracted and generalized from AGENTS_v3.3 §17, §17.2, §17.3. Stack-agnostic reference for the enterprise-ai-dev skill.
+> Buildloop public reference for defining architecture boundaries in AI-assisted delivery.
 
 ---
 
@@ -113,4 +113,4 @@ This exists because the first interface design is rarely the best. The cost of r
 
 ---
 
-*Source: AGENTS_v3.3 §17, §17.2, §17.3*
+*Source: buildloop/reference/architecture-boundaries.md*

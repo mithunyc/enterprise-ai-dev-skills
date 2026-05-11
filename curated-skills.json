@@ -1,6 +1,6 @@
 {
   "name": "buildloop",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Spec-to-Production Control Plane. Curated skills, templates, and gate scripts for enterprise-grade AI-assisted software delivery.",
   "repository": "https://github.com/mithunyc/buildloop",
   "tiers": {
@@ -121,8 +121,8 @@
   "upstreamSkills": [
     {
       "repo": "mattpocock/skills",
-      "commit": "733d312884b3878a9a9cff693c5886943753a741",
-      "verified_date": "2026-05-09",
+      "commit": "9f2e0bd0ea776eb6372eb81fa8a4a47814a8404a",
+      "verified_date": "2026-05-11",
       "skills": [
         {
           "name": "setup-matt-pocock-skills",
@@ -184,7 +184,7 @@
     {
       "repo": "obra/superpowers",
       "commit": "f2cbfbefebbfef77321e4c9abc9e949826bea9d7",
-      "verified_date": "2026-05-09",
+      "verified_date": "2026-05-11",
       "skills": [
         {
           "name": "brainstorming",
@@ -248,7 +248,7 @@
     {
       "repo": "openai/skills",
       "commit": "4c4058ebf44f6734e62c70ab4a81246d4d093fc8",
-      "verified_date": "2026-05-09",
+      "verified_date": "2026-05-11",
       "skills": [
         {
           "name": "security-best-practices",

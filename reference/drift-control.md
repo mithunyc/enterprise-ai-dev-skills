@@ -1,6 +1,6 @@
 # Drift Control
 
-> Extracted and generalized from AGENTS_v3.3 §15. Stack-agnostic reference for the enterprise-ai-dev skill.
+> Buildloop public reference for detecting and correcting governance drift.
 
 ---
 
@@ -69,4 +69,4 @@ This exists because implementation drift, governance drift, and environment drif
 
 ---
 
-*Source: AGENTS_v3.3 §15*
+*Source: buildloop/reference/drift-control.md*

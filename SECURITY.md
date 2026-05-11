@@ -13,8 +13,8 @@ Upstream skills in [`curated-skills.json`](curated-skills.json) are pinned to fu
 ```json
 {
   "repo": "mattpocock/skills",
-  "commit": "733d312884b3878a9a9cff693c5886943753a741",
-  "verified_date": "2026-05-09"
+  "commit": "9f2e0bd0ea776eb6372eb81fa8a4a47814a8404a",
+  "verified_date": "2026-05-11"
 }
 ```
 

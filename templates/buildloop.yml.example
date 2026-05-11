@@ -74,7 +74,7 @@ protected_paths:
   - "**/*.p12"
   - ".github/workflows/**"
   # [CUSTOMIZE] Uncomment and adapt as needed:
-  # - "supabase/migrations/**"
+  # - "database/migrations/**"
   # - "infra/**"
   # - "terraform/**"
   # - "k8s/**"

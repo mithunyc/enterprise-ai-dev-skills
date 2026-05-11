@@ -55,7 +55,7 @@
     },
     "active_overrides": [
       {
-        "path": ".governance/sprint-zero.md",
+        "path": ".governance/stabilization-review.md",
         "status": "active",
         "freshness": {
           "last_verified": "2026-01-15T14:30:00Z",
@@ -182,10 +182,10 @@
   "decision": {
     "recommended_path": "stabilize_then_continue",
     "feature_work_blocked": true,
-    "block_reason": "Active sprint-zero override blocks all feature work until data authority closure is complete.",
+    "block_reason": "Active stabilization override blocks all feature work until data authority closure is complete.",
     "unresolved_questions": [
       {
-        "question": "Should the sprint-zero override be refreshed or expired? Last verified 15 days ago.",
+        "question": "Should the stabilization override be refreshed or expired? Last verified 15 days ago.",
         "impact": "blocks_execution"
       }
     ]

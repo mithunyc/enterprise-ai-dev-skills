@@ -1,6 +1,6 @@
 # Bootstrap Protocol Reference
 
-Source: AGENTS_v3.3 §6 (generalized)
+Source: buildloop bootstrap protocol
 
 This document explains how to start safely on any repo — new or existing.
 
@@ -218,4 +218,4 @@ If dirty state → ask: stash / branch / commit / halt.
 
 ---
 
-*Source: buildloop/reference/bootstrap-protocol.md | Upstream: AGENTS_v3.3 §6*
+*Source: buildloop/reference/bootstrap-protocol.md*

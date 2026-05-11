@@ -1,6 +1,6 @@
 # Quality Gates
 
-> Extracted and generalized from AGENTS_v3.3 §32. Stack-agnostic reference for the enterprise-ai-dev skill.
+> Buildloop public reference for evidence-based quality gates.
 
 Replace `[YOUR_X_COMMAND]` placeholders with the actual commands for your project (e.g., `npm run lint`, `cargo test`, `make build`).
 
@@ -74,4 +74,4 @@ Before any code is considered production-ready:
 
 ---
 
-*Source: AGENTS_v3.3 §32*
+*Source: buildloop/reference/quality-gates.md*

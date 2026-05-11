@@ -1,6 +1,6 @@
 # Security Triggers
 
-> Extracted and generalized from AGENTS_v3.3 §16. Stack-agnostic reference for the enterprise-ai-dev skill.
+> Buildloop public reference for security triggers and escalation points.
 
 ---
 
@@ -76,4 +76,4 @@ This exists because checkbox security is worse than honest uncertainty.
 
 ---
 
-*Source: AGENTS_v3.3 §16*
+*Source: buildloop/reference/security-triggers.md*

@@ -155,4 +155,4 @@ Stale items to resolve:
 
 ---
 
-*Source: buildloop/templates/evidence-receipt.md | Upstream: AGENTS_v3.3 §13*
+*Source: buildloop/templates/evidence-receipt.md*

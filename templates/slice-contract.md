@@ -108,4 +108,4 @@ If context fills mid-story:
 
 ---
 
-*Source: buildloop/templates/slice-contract.md | Upstream: AGENTS_v3.3 §10, synthesis*
+*Source: buildloop/templates/slice-contract.md*

@@ -103,4 +103,4 @@ If CONDITIONAL GO — required before merge:
 
 ---
 
-*Source: buildloop/templates/adversarial-review.md | Upstream: AGENTS_v3.3 §14*
+*Source: buildloop/templates/adversarial-review.md*

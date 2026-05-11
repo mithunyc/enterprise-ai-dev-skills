@@ -159,4 +159,4 @@ Estimated effort: [hours/days]
 
 ---
 
-*Source: buildloop/templates/diagnostic-baseline.md | Upstream: AGENTS_v3.3 §6.4*
+*Source: buildloop/templates/diagnostic-baseline.md*

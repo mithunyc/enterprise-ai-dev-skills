@@ -100,4 +100,4 @@ If none: Session completed all planned work.
 
 ---
 
-*Source: buildloop/templates/handoff.md | Upstream: AGENTS_v3.3 §9, synthesis*
+*Source: buildloop/templates/handoff.md*

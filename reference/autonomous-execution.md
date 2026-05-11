@@ -1,6 +1,6 @@
 # Autonomous Execution Contract
 
-> Extracted and generalized from AGENTS_v3.3 §31, §31.2, §31.5, §31.6. Stack-agnostic reference for the enterprise-ai-dev skill.
+> Buildloop public reference for safe autonomous execution after requirements and gates are clear.
 
 ---
 
@@ -136,4 +136,4 @@ If any step fails, the iteration should diagnose and fix (if safe) or escalate.
 
 ---
 
-*Source: AGENTS_v3.3 §31, §31.2, §31.5, §31.6*
+*Source: buildloop/reference/autonomous-execution.md*

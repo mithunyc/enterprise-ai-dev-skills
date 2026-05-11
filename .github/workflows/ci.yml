@@ -162,7 +162,7 @@ jobs:
           NODE
 
   test:
-    name: Run install tests
+    name: Validate distribution
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -173,5 +173,45 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Guard public surface
+        run: |
+          node --input-type=module <<'NODE'
+          import { execSync } from 'node:child_process';
+          import { readFileSync } from 'node:fs';
+
+          const internal = execSync('git ls-files docs tasks audits', { encoding: 'utf8' }).trim();
+          if (internal) {
+            throw new Error(`Internal-only paths are tracked:\n${internal}`);
+          }
+
+          const files = execSync('git ls-files', { encoding: 'utf8' })
+            .trim()
+            .split('\n')
+            .filter(Boolean);
+
+          const localPathPatterns = [
+            /[A-Za-z]:\\Users\\[^\\\r\n]+\\/,
+            /\/Users\/[^/\s]+\//,
+            /\/home\/[^/\s]+\//,
+          ];
+
+          for (const file of files) {
+            const raw = readFileSync(file, 'utf8');
+            for (const pattern of localPathPatterns) {
+              if (pattern.test(raw)) {
+                throw new Error(`${file}: contains machine-local path`);
+              }
+            }
+          }
+
+          console.log('Public surface guard passed.');
+          NODE
+
       - name: Run install test suite
         run: node tests/install.test.mjs
+
+      - name: Run manifest validator
+        run: node scripts/validate-manifest.mjs
+
+      - name: Run upstream pin audit
+        run: node scripts/audit-upstream.mjs

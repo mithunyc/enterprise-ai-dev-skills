@@ -1,6 +1,6 @@
 # Brownfield Adoption Reference
 
-Source: docs/ROADMAP.md (this repo), AGENTS_v3.3 §6.4
+Source: buildloop brownfield adoption pattern
 
 This document governs how to safely adopt the buildloop control plane
 on an existing project without breaking what already works.
@@ -138,4 +138,4 @@ Never silently pick one instruction over another at the same authority level.
 
 ---
 
-*Source: buildloop/reference/brownfield-adoption.md | Upstream: docs/ROADMAP.md, AGENTS_v3.3 §6.4*
+*Source: buildloop/reference/brownfield-adoption.md*

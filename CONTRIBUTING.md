@@ -93,7 +93,7 @@ The bad example gives the agent no way to distinguish this from other skills.
 | Consistent terminology | Same terms used throughout |
 | Concrete examples | At least one real usage example |
 | References one level deep | No deep nesting of includes |
-| No banned words | `grep -i "arkaan\|supabase" SKILL.md` returns 0 |
+| No private context | No private project names, customer names, or local machine paths |
 
 ---
 
@@ -164,8 +164,8 @@ files.forEach(f => {
 process.exit(ok ? 0 : 1);
 "
 
-# 3. Check for banned words in your skill
-grep -ri "arkaan\|supabase" skills/your-skill-name/ && echo "FAIL: banned words" || echo "OK: no banned words"
+# 3. Check for private context in your skill
+grep -ri "PRIVATE_PROJECT\\|CUSTOMER_NAME\\|/Users/\\|C:\\\\Users" skills/your-skill-name/ && echo "FAIL: private context" || echo "OK: no private context"
 
 # 4. Check skill description length
 node -e "
