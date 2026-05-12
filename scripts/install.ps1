@@ -117,6 +117,36 @@ function Copy-Skill {
   Write-Host "  added $Name"
 }
 
+function Copy-Command {
+  param([string]$Source, [string]$Name, [string]$DestRoot)
+  $dest = Join-Path $DestRoot "$Name.md"
+  if ((Test-Path $dest) -and -not $Force) {
+    Write-Host "  skip  /$Name (exists; use -Force to overwrite)"
+    return
+  }
+  if ($DryRun) { Write-Host "  dry   /$Name -> $dest"; return }
+  New-Item -ItemType Directory -Force -Path $DestRoot | Out-Null
+  Copy-Item -Force -LiteralPath $Source -Destination $dest
+  Write-Host "  added /$Name"
+}
+
+function Install-ClaudeCommands {
+  param([string]$RepoRoot)
+  $commandsRoot = Join-Path $HOME ".claude\commands"
+  $commands = @("orchestrator", "buildloop")
+
+  Write-Host ""
+  Write-Host "[claude] Installing slash command aliases..."
+  foreach ($commandName in $commands) {
+    $source = Join-Path $RepoRoot "commands\claude\$commandName.md"
+    if (-not (Test-Path $source)) {
+      Write-Warning "  Claude command not found: $commandName - skipping"
+      continue
+    }
+    Copy-Command -Source $source -Name $commandName -DestRoot $commandsRoot
+  }
+}
+
 function Normalize-Skill {
   param([string]$SkillPath)
   $md = Join-Path $SkillPath "SKILL.md"
@@ -278,6 +308,10 @@ try {
       if ($paths.Count -gt 0) {
         Install-FromRepo -Repo $repo -Paths $paths -DestRoot $dest.Path
       }
+    }
+
+    if ($dest.Target -eq "claude") {
+      Install-ClaudeCommands -RepoRoot $repoRoot
     }
 
     Write-Host ""

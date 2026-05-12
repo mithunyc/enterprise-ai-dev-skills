@@ -237,6 +237,51 @@ copy_skill() {
   echo "  added $name"
 }
 
+copy_command() {
+  local source="$1"
+  local name="$2"
+  local dest_root="$3"
+  local dest="$dest_root/$name.md"
+
+  if [[ -e "$dest" && "$FORCE" != "1" ]]; then
+    echo "  skip  /$name (exists; use --force to overwrite)"
+    return
+  fi
+  if [[ "$DRY_RUN" == "1" ]]; then
+    echo "  dry   /$name -> $dest"
+    return
+  fi
+  mkdir -p "$dest_root"
+  cp "$source" "$dest"
+  echo "  added /$name"
+}
+
+target_to_command_dir() {
+  local target="$1"
+  case "$target" in
+    claude) echo "$HOME/.claude/commands" ;;
+    *) echo "" ;;
+  esac
+}
+
+install_commands_for_target() {
+  local target="$1"
+  local command_root
+  command_root="$(target_to_command_dir "$target")"
+  if [[ -z "$command_root" ]]; then return; fi
+
+  echo
+  echo "[$target] Installing slash command aliases..."
+  for command_name in orchestrator buildloop; do
+    local source="$repo_root/commands/claude/$command_name.md"
+    if [[ ! -f "$source" ]]; then
+      echo "  Warning: Claude command not found: $command_name - skipping" >&2
+      continue
+    fi
+    copy_command "$source" "$command_name" "$command_root"
+  done
+}
+
 install_from_repo() {
   local repo="$1"
   local dest_root="$2"
@@ -353,6 +398,8 @@ for target in "${resolved_targets[@]}"; do
   if [[ -n "$openai_paths" ]]; then
     install_from_repo "openai/skills" "$dest_root" $openai_paths
   fi
+
+  install_commands_for_target "$target"
 
   echo
 done

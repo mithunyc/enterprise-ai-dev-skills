@@ -167,6 +167,47 @@ check('markdown templates have frontmatter with top-level keys', () => {
   return templateFiles.length;
 });
 
+check('Claude command aliases are packaged and installer-wired', () => {
+  const commandFiles = [
+    resolve(ROOT, 'commands', 'claude', 'orchestrator.md'),
+    resolve(ROOT, 'commands', 'claude', 'buildloop.md'),
+  ];
+
+  for (const commandFile of commandFiles) {
+    assert.ok(existsSync(commandFile), `${displayPath(commandFile)} must exist`);
+    const keys = validateYamlFrontmatter(commandFile);
+    assert.ok(keys.has('name'), `${displayPath(commandFile)} frontmatter must include name`);
+    assert.ok(keys.has('description'), `${displayPath(commandFile)} frontmatter must include description`);
+    assert.match(
+      readText(commandFile),
+      /Use enterprise-ai-dev as my master CTO orchestrator for this repo\./,
+      `${displayPath(commandFile)} must preserve the canonical invocation contract`,
+    );
+  }
+
+  const bashInstaller = readText(resolve(ROOT, 'scripts', 'install.sh'));
+  const psInstaller = readText(resolve(ROOT, 'scripts', 'install.ps1'));
+
+  assert.ok(
+    bashInstaller.includes('install_commands_for_target "$target"'),
+    'install.sh must install command aliases for supported targets',
+  );
+  assert.ok(
+    bashInstaller.includes('commands/claude/$command_name.md'),
+    'install.sh must source Claude command aliases from commands/claude',
+  );
+  assert.ok(
+    psInstaller.includes('function Install-ClaudeCommands'),
+    'install.ps1 must install Claude command aliases',
+  );
+  assert.ok(
+    psInstaller.includes('commands\\claude\\$commandName.md'),
+    'install.ps1 must source Claude command aliases from commands/claude',
+  );
+
+  return commandFiles.length;
+});
+
 check('schema files parse as JSON', () => {
   const schemaFiles = walkFiles(resolve(ROOT, 'schemas'))
     .filter((file) => extname(file).toLowerCase() === '.json');
@@ -207,6 +248,28 @@ check('installers bootstrap full payload for one-line installs', () => {
   assert.ok(
     psInstaller.includes('function Resolve-BuildloopRoot'),
     'install.ps1 must resolve or download the Buildloop payload when run standalone',
+  );
+});
+
+check('public docs describe Claude command install behavior', () => {
+  const readme = readText(resolve(ROOT, 'README.md'));
+  const security = readText(resolve(ROOT, 'SECURITY.md'));
+
+  assert.ok(
+    readme.includes('~/.claude/commands'),
+    'README.md must disclose the Claude command install directory',
+  );
+  assert.ok(
+    readme.includes('/orchestrator') && readme.includes('/buildloop'),
+    'README.md must document the Claude slash command aliases',
+  );
+  assert.ok(
+    security.includes('~/.claude/commands'),
+    'SECURITY.md must disclose the Claude command install directory',
+  );
+  assert.ok(
+    !security.includes("Does **not** modify any file outside the agent's skills directory."),
+    'SECURITY.md must not claim the installer writes only to skills directories',
   );
 });
 

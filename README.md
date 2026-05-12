@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml/badge.svg)](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.0.6-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.6)
+[![Version](https://img.shields.io/badge/version-v2.0.7-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.7)
 
 **Spec-to-production control plane for AI-assisted software delivery.**
 
@@ -88,12 +88,12 @@ powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1
 | Target | Install Directory | Confidence |
 |--------|-------------------|------------|
 | `codex` | `$CODEX_HOME/skills` or `~/.codex/skills` | Proven |
-| `claude` | `~/.claude/skills` | Proven |
+| `claude` | `~/.claude/skills` plus `/orchestrator` and `/buildloop` aliases in `~/.claude/commands` | Proven |
 | `cursor` | `~/.cursor/skills` | Experimental |
 | `antigravity` | `~/.gemini/antigravity/skills` | Experimental |
 
 > **Security note:** These are remote one-line installers. Read `scripts/install.*` before running on sensitive machines. See [SECURITY.md](SECURITY.md).
-> Existing skills are skipped by default so the installer is safe to rerun. Use `--force` or `-Force` only when you intentionally want to overwrite installed skills.
+> Existing skills and command aliases are skipped by default so the installer is safe to rerun. Use `--force` or `-Force` only when you intentionally want to overwrite installed Buildloop files.
 
 ---
 
@@ -138,7 +138,16 @@ Use enterprise-ai-dev as my master CTO orchestrator for this repo.
 
 Buildloop currently installs the main orchestrator skill under the canonical skill name `enterprise-ai-dev` for compatibility with existing agent skill discovery.
 
-If the agent does not see the skill, restart the app. If it still does not respond correctly, install to the project-local skills directory for that agent.
+### Invocation Matrix
+
+| Agent | Best Invocation | Notes |
+|-------|-----------------|-------|
+| OpenAI Codex | `Use enterprise-ai-dev as my master CTO orchestrator for this repo.` | Codex custom slash-command aliases are not claimed by Buildloop. |
+| Claude Code | `/orchestrator` or `/buildloop` | The Claude installer adds these aliases under `~/.claude/commands/`. `/enterprise-ai-dev` may also work because Claude Code can invoke installed skills directly. |
+| Cursor | `Use enterprise-ai-dev as my master CTO orchestrator for this repo.` | Skill-directory behavior is experimental. |
+| Google Antigravity | `Use enterprise-ai-dev as my master CTO orchestrator for this repo.` | Skill-directory behavior is experimental. |
+
+If the agent does not see the skill or command, restart the app. If it still does not respond correctly, rerun the installer for that target with `--force` or `-Force`.
 
 ---
 
@@ -176,6 +185,7 @@ Deterministic gates with an independent witness. No self-grading.
 
 ```
 skills/             Local skills installed directly (enterprise-ai-dev, awesome-design-md, …)
+commands/           Claude Code slash command aliases for /orchestrator and /buildloop
 templates/          Reusable governance artifacts (PRD, slice contracts, receipts, AGENTS template)
 schemas/            JSON schemas validating all frontmatter and YAML contracts
 reference/          Deep-reference docs for the lifecycle (phase engine, security triggers, …)
@@ -199,6 +209,7 @@ curated-skills.json Upstream skill registry with pinned commit SHAs
 - **CI** — validates templates, schemas, and scripts on every push.
 - **Reference docs** — phase engine, security triggers, architecture boundaries, quality gates, drift control, autonomous execution.
 - **Examples** — greenfield walkthrough and brownfield diagnostic fixture.
+- **Claude command aliases** — `/orchestrator` and `/buildloop` convenience commands installed for Claude Code.
 
 ---
 
