@@ -1,6 +1,6 @@
 {
   "name": "buildloop",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Spec-to-Production Control Plane. Curated skills, templates, and gate scripts for enterprise-grade AI-assisted software delivery.",
   "repository": "https://github.com/mithunyc/buildloop",
   "tiers": {

@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml/badge.svg)](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.0.3-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.3)
+[![Version](https://img.shields.io/badge/version-v2.0.4-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.4)
 
 **Spec-to-production control plane for AI-assisted software delivery.**
 
@@ -22,6 +22,8 @@ Curated skills, templates, schemas, and gate scripts that give AI coding agents 
 ## Install In One Command
 
 Restart your AI coding agent after installing.
+
+The installer is designed for fresh machines: it downloads the Buildloop payload if needed, installs the local Buildloop skills, and automatically installs the curated upstream skills for the selected tier at pinned commit SHAs. It requires internet access and `git`.
 
 ### macOS / Linux
 
@@ -91,6 +93,7 @@ powershell -ExecutionPolicy Bypass -Command "$p=Join-Path $env:TEMP 'install.ps1
 | `antigravity` | `~/.gemini/antigravity/skills` | Experimental |
 
 > **Security note:** These are remote one-line installers. Read `scripts/install.*` before running on sensitive machines. See [SECURITY.md](SECURITY.md).
+> Existing skills are skipped by default so the installer is safe to rerun. Use `--force` or `-Force` only when you intentionally want to overwrite installed skills.
 
 ---
 

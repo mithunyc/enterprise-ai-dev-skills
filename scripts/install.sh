@@ -5,6 +5,8 @@ FORCE=0
 DRY_RUN=0
 TARGETS="codex"
 MODE="core"
+BUILDLOOP_REPO_URL="${BUILDLOOP_REPO_URL:-https://github.com/mithunyc/buildloop.git}"
+BUILDLOOP_TEMP_ROOT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -38,7 +40,45 @@ case "$MODE" in
   *) echo "Unknown mode: $MODE. Valid modes: minimal, core, full, contributor." >&2; exit 1 ;;
 esac
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cleanup() {
+  if [[ -n "$BUILDLOOP_TEMP_ROOT" && -d "$BUILDLOOP_TEMP_ROOT" ]]; then
+    rm -rf "$BUILDLOOP_TEMP_ROOT"
+  fi
+}
+trap cleanup EXIT
+
+resolve_repo_root() {
+  local candidate
+  candidate="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." 2>/dev/null && pwd || true)"
+
+  if [[ -n "$candidate" && -f "$candidate/curated-skills.json" && -d "$candidate/skills" ]]; then
+    repo_root="$candidate"
+    return
+  fi
+
+  if ! command -v git >/dev/null 2>&1; then
+    echo "Buildloop installer needs git when run as a one-line remote installer." >&2
+    echo "Install git, or clone https://github.com/mithunyc/buildloop and run scripts/install.sh locally." >&2
+    exit 1
+  fi
+
+  BUILDLOOP_TEMP_ROOT="$(mktemp -d)"
+  echo "  source: downloading buildloop installer payload..."
+  if ! git clone -q --depth 1 "$BUILDLOOP_REPO_URL" "$BUILDLOOP_TEMP_ROOT"; then
+    echo "Failed to download buildloop from $BUILDLOOP_REPO_URL" >&2
+    exit 1
+  fi
+
+  if [[ ! -f "$BUILDLOOP_TEMP_ROOT/curated-skills.json" || ! -d "$BUILDLOOP_TEMP_ROOT/skills" ]]; then
+    echo "Downloaded buildloop payload is missing curated-skills.json or skills/." >&2
+    exit 1
+  fi
+
+  repo_root="$BUILDLOOP_TEMP_ROOT"
+}
+
+repo_root=""
+resolve_repo_root
 manifest_path="$repo_root/curated-skills.json"
 
 is_full_sha() {
@@ -98,33 +138,41 @@ NODE
 }
 
 # -- Skill lists per mode ---------------------------------------------------
-declare -A local_skills_by_mode=(
-  ["minimal"]="enterprise-ai-dev karpathy-guidelines"
-  ["core"]="enterprise-ai-dev karpathy-guidelines awesome-design-md caveman"
-  ["full"]="enterprise-ai-dev karpathy-guidelines awesome-design-md caveman grill-me"
-  ["contributor"]=""
-)
+local_skills_for_mode() {
+  case "$1" in
+    minimal) echo "enterprise-ai-dev karpathy-guidelines" ;;
+    core) echo "enterprise-ai-dev karpathy-guidelines awesome-design-md caveman" ;;
+    full) echo "enterprise-ai-dev karpathy-guidelines awesome-design-md caveman grill-me" ;;
+    contributor) echo "" ;;
+  esac
+}
 
-declare -A upstream_mattpocock_by_mode=(
-  ["minimal"]="skills/engineering/tdd skills/engineering/diagnose"
-  ["core"]="skills/engineering/tdd skills/engineering/diagnose skills/engineering/grill-with-docs skills/engineering/to-prd"
-  ["full"]="skills/engineering/tdd skills/engineering/diagnose skills/engineering/grill-with-docs skills/engineering/to-prd skills/engineering/triage skills/engineering/improve-codebase-architecture skills/engineering/zoom-out skills/engineering/setup-matt-pocock-skills"
-  ["contributor"]="skills/productivity/write-a-skill"
-)
+mattpocock_paths_for_mode() {
+  case "$1" in
+    minimal) echo "skills/engineering/tdd skills/engineering/diagnose" ;;
+    core) echo "skills/engineering/tdd skills/engineering/diagnose skills/engineering/grill-with-docs skills/engineering/to-prd" ;;
+    full) echo "skills/engineering/tdd skills/engineering/diagnose skills/engineering/grill-with-docs skills/engineering/to-prd skills/engineering/triage skills/engineering/improve-codebase-architecture skills/engineering/zoom-out skills/engineering/setup-matt-pocock-skills" ;;
+    contributor) echo "skills/productivity/write-a-skill" ;;
+  esac
+}
 
-declare -A upstream_obra_by_mode=(
-  ["minimal"]="skills/brainstorming"
-  ["core"]="skills/brainstorming skills/writing-plans skills/executing-plans skills/verification-before-completion"
-  ["full"]="skills/brainstorming skills/writing-plans skills/executing-plans skills/verification-before-completion skills/requesting-code-review skills/finishing-a-development-branch"
-  ["contributor"]=""
-)
+obra_paths_for_mode() {
+  case "$1" in
+    minimal) echo "skills/brainstorming" ;;
+    core) echo "skills/brainstorming skills/writing-plans skills/executing-plans skills/verification-before-completion" ;;
+    full) echo "skills/brainstorming skills/writing-plans skills/executing-plans skills/verification-before-completion skills/requesting-code-review skills/finishing-a-development-branch" ;;
+    contributor) echo "" ;;
+  esac
+}
 
-declare -A upstream_openai_by_mode=(
-  ["minimal"]=""
-  ["core"]="skills/.curated/security-best-practices"
-  ["full"]="skills/.curated/security-best-practices skills/.curated/security-threat-model"
-  ["contributor"]=""
-)
+openai_paths_for_mode() {
+  case "$1" in
+    minimal) echo "" ;;
+    core) echo "skills/.curated/security-best-practices" ;;
+    full) echo "skills/.curated/security-best-practices skills/.curated/security-threat-model" ;;
+    contributor) echo "" ;;
+  esac
+}
 
 # -- Target resolution ------------------------------------------------------
 resolve_dest_roots() {
@@ -257,7 +305,10 @@ install_from_repo() {
 }
 
 # -- Main -------------------------------------------------------------------
-mapfile -t resolved_targets < <(resolve_dest_roots "$TARGETS")
+resolved_targets=()
+while IFS= read -r target; do
+  resolved_targets+=("$target")
+done < <(resolve_dest_roots "$TARGETS")
 
 echo
 echo "buildloop installer"
@@ -275,7 +326,7 @@ for target in "${resolved_targets[@]}"; do
 
   # Local skills
   echo "[$target] Installing local skills..."
-  for skill_name in ${local_skills_by_mode["$MODE"]}; do
+  for skill_name in $(local_skills_for_mode "$MODE"); do
     source="$repo_root/skills/$skill_name"
     if [[ ! -d "$source" ]]; then
       echo "  Warning: Local skill not found: $skill_name - skipping" >&2
@@ -288,16 +339,19 @@ for target in "${resolved_targets[@]}"; do
   echo
   echo "[$target] Installing upstream skills..."
 
-  if [[ -n "${upstream_mattpocock_by_mode["$MODE"]}" ]]; then
-    install_from_repo "mattpocock/skills" "$dest_root" ${upstream_mattpocock_by_mode["$MODE"]}
+  mattpocock_paths="$(mattpocock_paths_for_mode "$MODE")"
+  if [[ -n "$mattpocock_paths" ]]; then
+    install_from_repo "mattpocock/skills" "$dest_root" $mattpocock_paths
   fi
 
-  if [[ -n "${upstream_obra_by_mode["$MODE"]}" ]]; then
-    install_from_repo "obra/superpowers" "$dest_root" ${upstream_obra_by_mode["$MODE"]}
+  obra_paths="$(obra_paths_for_mode "$MODE")"
+  if [[ -n "$obra_paths" ]]; then
+    install_from_repo "obra/superpowers" "$dest_root" $obra_paths
   fi
 
-  if [[ -n "${upstream_openai_by_mode["$MODE"]}" ]]; then
-    install_from_repo "openai/skills" "$dest_root" ${upstream_openai_by_mode["$MODE"]}
+  openai_paths="$(openai_paths_for_mode "$MODE")"
+  if [[ -n "$openai_paths" ]]; then
+    install_from_repo "openai/skills" "$dest_root" $openai_paths
   fi
 
   echo

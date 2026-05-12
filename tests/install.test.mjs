@@ -169,6 +169,37 @@ check('schema files parse as JSON', () => {
   return schemaFiles.length;
 });
 
+check('installers bootstrap full payload for one-line installs', () => {
+  const bashInstaller = readText(resolve(ROOT, 'scripts', 'install.sh'));
+  const psInstaller = readText(resolve(ROOT, 'scripts', 'install.ps1'));
+
+  assert.ok(
+    bashInstaller.includes('BUILDLOOP_REPO_URL="${BUILDLOOP_REPO_URL:-https://github.com/mithunyc/buildloop.git}"'),
+    'install.sh must define an overrideable Buildloop repo URL',
+  );
+  assert.ok(
+    bashInstaller.includes('resolve_repo_root'),
+    'install.sh must resolve or download the Buildloop payload when run standalone',
+  );
+  assert.ok(
+    !bashInstaller.includes('declare -A'),
+    'install.sh must not require Bash 4 associative arrays; macOS default Bash is older',
+  );
+  assert.ok(
+    !bashInstaller.includes('mapfile'),
+    'install.sh must not require mapfile; macOS default Bash is older',
+  );
+
+  assert.ok(
+    psInstaller.includes('$BuildloopRepoUrl = if ($env:BUILDLOOP_REPO_URL)'),
+    'install.ps1 must define an overrideable Buildloop repo URL',
+  );
+  assert.ok(
+    psInstaller.includes('function Resolve-BuildloopRoot'),
+    'install.ps1 must resolve or download the Buildloop payload when run standalone',
+  );
+});
+
 if (process.exitCode) {
   process.exit(process.exitCode);
 }

@@ -11,6 +11,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+$BuildloopRepoUrl = if ($env:BUILDLOOP_REPO_URL) { $env:BUILDLOOP_REPO_URL } else { "https://github.com/mithunyc/buildloop.git" }
+$script:BuildloopTempRoot = $null
+$script:RepoRoot = $null
+
 # -- Skill lists per mode ---------------------------------------------------
 $LocalSkillsByMode = @{
   minimal     = @("enterprise-ai-dev", "karpathy-guidelines")
@@ -129,8 +133,7 @@ function Test-FullSha {
 
 function Get-PinnedCommit {
   param([string]$Repo)
-  $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
-  $manifestPath = Join-Path $repoRoot "curated-skills.json"
+  $manifestPath = Join-Path $script:RepoRoot "curated-skills.json"
   $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
   $entry = @($manifest.upstreamSkills | Where-Object { $_.repo -eq $Repo } | Select-Object -First 1)
 
@@ -155,6 +158,37 @@ function Invoke-Git {
     throw $message
   }
   return $output
+}
+
+function Resolve-BuildloopRoot {
+  $candidate = $null
+  try {
+    $candidate = (Resolve-Path (Join-Path $PSScriptRoot "..") -ErrorAction Stop).Path
+  }
+  catch {
+    $candidate = $null
+  }
+
+  if ($candidate -and
+      (Test-Path (Join-Path $candidate "curated-skills.json")) -and
+      (Test-Path (Join-Path $candidate "skills"))) {
+    return $candidate
+  }
+
+  if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    throw "Buildloop installer needs git when run as a one-line remote installer. Install git, or clone https://github.com/mithunyc/buildloop and run scripts/install.ps1 locally."
+  }
+
+  $script:BuildloopTempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("buildloop-installer-" + [Guid]::NewGuid().ToString("N"))
+  Write-Host "  source: downloading buildloop installer payload..."
+  Invoke-Git -Arguments @("clone", "-q", "--depth", "1", $BuildloopRepoUrl, $script:BuildloopTempRoot) | Out-Null
+
+  if (-not (Test-Path (Join-Path $script:BuildloopTempRoot "curated-skills.json")) -or
+      -not (Test-Path (Join-Path $script:BuildloopTempRoot "skills"))) {
+    throw "Downloaded buildloop payload is missing curated-skills.json or skills/."
+  }
+
+  return $script:BuildloopTempRoot
 }
 
 function Install-FromRepo {
@@ -201,50 +235,58 @@ function Install-FromRepo {
 }
 
 # -- Main -------------------------------------------------------------------
-$repoRoot  = Resolve-Path (Join-Path $PSScriptRoot "..")
+$script:RepoRoot = Resolve-BuildloopRoot
+$repoRoot  = $script:RepoRoot
 $destRoots = Resolve-SkillsDirs $Target
 
-Write-Host ""
-Write-Host "buildloop installer"
-Write-Host "  Mode   : $Mode"
-Write-Host "  Target : $($Target -join ', ')"
-if ($DryRun) { Write-Host "  DRY RUN - no files will be written" }
-Write-Host ""
+try {
+  Write-Host ""
+  Write-Host "buildloop installer"
+  Write-Host "  Mode   : $Mode"
+  Write-Host "  Target : $($Target -join ', ')"
+  if ($DryRun) { Write-Host "  DRY RUN - no files will be written" }
+  Write-Host ""
 
-foreach ($dest in $destRoots) {
-  New-Item -ItemType Directory -Force -Path $dest.Path | Out-Null
+  foreach ($dest in $destRoots) {
+    New-Item -ItemType Directory -Force -Path $dest.Path | Out-Null
 
-  # -- Conflict report ------------------------------------------------------
-  $allSkillNames = $LocalSkillsByMode[$Mode] + ($UpstreamByMode[$Mode].Values | ForEach-Object { $_ | ForEach-Object { Split-Path $_ -Leaf } })
-  $skillConflicts = Get-ConflictReport -DestRoot $dest.Path -IncomingSkills $allSkillNames
-  if ($skillConflicts.Count -gt 0) {
-    Write-Host "CONFLICT REPORT for $($dest.Target):"
-    foreach ($c in $skillConflicts) { Write-Host "  - $c already installed (will skip unless -Force)" }
+    # -- Conflict report ----------------------------------------------------
+    $allSkillNames = $LocalSkillsByMode[$Mode] + ($UpstreamByMode[$Mode].Values | ForEach-Object { $_ | ForEach-Object { Split-Path $_ -Leaf } })
+    $skillConflicts = Get-ConflictReport -DestRoot $dest.Path -IncomingSkills $allSkillNames
+    if ($skillConflicts.Count -gt 0) {
+      Write-Host "CONFLICT REPORT for $($dest.Target):"
+      foreach ($c in $skillConflicts) { Write-Host "  - $c already installed (will skip unless -Force)" }
+      Write-Host ""
+    }
+
+    # -- Local skills -------------------------------------------------------
+    Write-Host "[$($dest.Target)] Installing local skills..."
+    foreach ($skillName in $LocalSkillsByMode[$Mode]) {
+      $source = Join-Path $repoRoot "skills\$skillName"
+      if (-not (Test-Path $source)) {
+        Write-Warning "  Local skill not found: $skillName - skipping"
+        continue
+      }
+      Copy-Skill -Source $source -Name $skillName -DestRoot $dest.Path
+    }
+
+    # -- Upstream skills ----------------------------------------------------
+    Write-Host ""
+    Write-Host "[$($dest.Target)] Installing upstream skills..."
+    foreach ($repo in $UpstreamByMode[$Mode].Keys) {
+      $paths = $UpstreamByMode[$Mode][$repo]
+      if ($paths.Count -gt 0) {
+        Install-FromRepo -Repo $repo -Paths $paths -DestRoot $dest.Path
+      }
+    }
+
     Write-Host ""
   }
-
-  # -- Local skills ---------------------------------------------------------
-  Write-Host "[$($dest.Target)] Installing local skills..."
-  foreach ($skillName in $LocalSkillsByMode[$Mode]) {
-    $source = Join-Path $repoRoot "skills\$skillName"
-    if (-not (Test-Path $source)) {
-      Write-Warning "  Local skill not found: $skillName - skipping"
-      continue
-    }
-    Copy-Skill -Source $source -Name $skillName -DestRoot $dest.Path
+}
+finally {
+  if ($script:BuildloopTempRoot -and (Test-Path $script:BuildloopTempRoot)) {
+    Remove-Item -Recurse -Force -LiteralPath $script:BuildloopTempRoot -ErrorAction SilentlyContinue
   }
-
-  # -- Upstream skills ------------------------------------------------------
-  Write-Host ""
-  Write-Host "[$($dest.Target)] Installing upstream skills..."
-  foreach ($repo in $UpstreamByMode[$Mode].Keys) {
-    $paths = $UpstreamByMode[$Mode][$repo]
-    if ($paths.Count -gt 0) {
-      Install-FromRepo -Repo $repo -Paths $paths -DestRoot $dest.Path
-    }
-  }
-
-  Write-Host ""
 }
 
 Write-Host "Done. Restart your AI coding agent to pick up new skills."

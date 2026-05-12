@@ -54,6 +54,7 @@ You control this list. Add your project's sensitive paths before enabling autono
 
 - Copies the local wrapper skills from this repository.
 - Downloads curated upstream skills from their original public GitHub repositories at pinned commits.
+- When run as a one-line remote installer, downloads the Buildloop payload to a temporary directory so local and upstream skills can both be installed.
 - Removes one non-standard frontmatter key from imported skills for agent compatibility.
 - Does **not** request secrets, credentials, API keys, or production access.
 - Does **not** modify any file outside the agent's skills directory.
