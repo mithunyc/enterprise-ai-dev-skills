@@ -1,0 +1,7 @@
+# Line-ending normalization for cross-platform development.
+# Shell scripts must stay LF to work on macOS/Linux and WSL/Git Bash on Windows.
+# PowerShell scripts use CRLF per Windows convention.
+
+*.sh    text eol=lf
+*.ps1   text eol=crlf
+*.mjs   text eol=lf

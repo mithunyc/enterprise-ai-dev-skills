@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml/badge.svg)](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.0.4-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.4)
+[![Version](https://img.shields.io/badge/version-v2.0.5-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.5)
 
 **Spec-to-production control plane for AI-assisted software delivery.**
 
@@ -120,8 +120,8 @@ Choose the tier that matches your project complexity. The default install mode i
 | Tier | Skills | Best For |
 |------|--------|----------|
 | **MINIMAL** | `enterprise-ai-dev`, `karpathy-guidelines`, `brainstorming`, `tdd`, `diagnose` — **5 skills** | Solo developers, small context windows, simple projects |
-| **CORE** | Everything in MINIMAL + `awesome-design-md`, `caveman`, `writing-plans`, `executing-plans`, `grill-with-docs`, `verification-before-completion`, `security-best-practices` — **12 skills** | Default. Covers 80% of projects. |
-| **FULL** | Everything in CORE + `grill-me`, `triage`, `improve-codebase-architecture`, `zoom-out`, `finishing-a-development-branch`, `requesting-code-review`, `security-threat-model`, `setup-matt-pocock-skills` — **20 skills** | Teams, complex projects, full review and release discipline |
+| **CORE** | Everything in MINIMAL + `awesome-design-md`, `caveman`, `writing-plans`, `executing-plans`, `grill-with-docs`, `to-prd`, `verification-before-completion`, `security-best-practices` — **13 skills** | Default. Covers 80% of projects. |
+| **FULL** | Everything in CORE + `grill-me`, `triage`, `improve-codebase-architecture`, `zoom-out`, `finishing-a-development-branch`, `requesting-code-review`, `security-threat-model`, `setup-matt-pocock-skills` — **21 skills** | Teams, complex projects, full review and release discipline |
 | **CONTRIBUTOR** | `write-a-skill` — for skill authors | Writing or publishing new skills |
 
 Tier counts are derived from [`curated-skills.json`](curated-skills.json) and validated by CI.

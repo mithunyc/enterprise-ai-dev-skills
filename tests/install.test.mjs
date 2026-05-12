@@ -47,6 +47,16 @@ function parseJson(path) {
   return JSON.parse(readText(path));
 }
 
+function namesForTier(list, tier) {
+  return list
+    .filter((item) => Array.isArray(item.tier) && item.tier.includes(tier))
+    .map((item) => item.name);
+}
+
+function sortedUnique(values) {
+  return [...new Set(values)].sort();
+}
+
 function frontmatterFor(path) {
   const raw = readText(path);
   assert.ok(raw.startsWith('---\n') || raw.startsWith('---\r\n'), `${displayPath(path)} must start with frontmatter`);
@@ -198,6 +208,47 @@ check('installers bootstrap full payload for one-line installs', () => {
     psInstaller.includes('function Resolve-BuildloopRoot'),
     'install.ps1 must resolve or download the Buildloop payload when run standalone',
   );
+});
+
+check('manifest tier summaries match installer skill declarations', () => {
+  assert.ok(manifest, 'manifest must be parsed before tier parity checks');
+
+  const allTiers = Object.keys(manifest.tiers);
+  assert.deepEqual(
+    sortedUnique(allTiers),
+    ['contributor', 'core', 'full', 'minimal'],
+    'manifest.tiers must define the supported installer modes',
+  );
+
+  for (const tier of allTiers) {
+    const declared = sortedUnique([
+      ...(manifest.tiers[tier].localSkills ?? []),
+      ...(manifest.tiers[tier].upstreamSkills ?? []),
+    ]);
+
+    const expected = sortedUnique([
+      ...namesForTier(manifest.localSkills, tier),
+      ...manifest.upstreamSkills.flatMap((repo) => namesForTier(repo.skills ?? [], tier)),
+    ]);
+
+    assert.deepEqual(declared, expected, `${tier} tier summary must match per-skill tier declarations`);
+  }
+
+  const bashInstaller = readText(resolve(ROOT, 'scripts', 'install.sh'));
+  const psInstaller = readText(resolve(ROOT, 'scripts', 'install.ps1'));
+
+  for (const repo of manifest.upstreamSkills) {
+    for (const skill of repo.skills ?? []) {
+      assert.ok(
+        bashInstaller.includes(skill.path),
+        `install.sh must include upstream skill path from manifest: ${skill.path}`,
+      );
+      assert.ok(
+        psInstaller.includes(skill.path.replaceAll('/', '\\')) || psInstaller.includes(skill.path),
+        `install.ps1 must include upstream skill path from manifest: ${skill.path}`,
+      );
+    }
+  }
 });
 
 if (process.exitCode) {

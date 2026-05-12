@@ -1,6 +1,6 @@
 {
   "name": "buildloop",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Spec-to-Production Control Plane. Curated skills, templates, and gate scripts for enterprise-grade AI-assisted software delivery.",
   "repository": "https://github.com/mithunyc/buildloop",
   "tiers": {
@@ -31,6 +31,7 @@
         "writing-plans",
         "executing-plans",
         "grill-with-docs",
+        "to-prd",
         "verification-before-completion",
         "security-best-practices"
       ]
@@ -51,6 +52,7 @@
         "writing-plans",
         "executing-plans",
         "grill-with-docs",
+        "to-prd",
         "verification-before-completion",
         "security-best-practices",
         "triage",
@@ -166,6 +168,13 @@
           ]
         },
         {
+          "name": "triage",
+          "path": "skills/engineering/triage",
+          "tier": [
+            "full"
+          ]
+        },
+        {
           "name": "improve-codebase-architecture",
           "path": "skills/engineering/improve-codebase-architecture",
           "tier": [
@@ -177,6 +186,13 @@
           "path": "skills/engineering/zoom-out",
           "tier": [
             "full"
+          ]
+        },
+        {
+          "name": "write-a-skill",
+          "path": "skills/productivity/write-a-skill",
+          "tier": [
+            "contributor"
           ]
         }
       ]
