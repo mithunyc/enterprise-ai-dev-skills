@@ -203,7 +203,7 @@ The orchestrator routes work to specialists. It does not pretend to be every ski
 | Security | `security-best-practices`, `security-threat-model` |
 | Issue triage | `triage` |
 
-Read `references/risk-matrix.md` for risk-level controls.
+Read `reference/quality-gates.md` and `reference/security-triggers.md` for risk-level controls.
 
 ---
 
