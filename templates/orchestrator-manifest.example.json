@@ -8,8 +8,8 @@
     "evidence_type": "extracted",
     "repo_root": "/absolute/path/to/repo",
     "code_paths": ["src/", "packages/", "apps/"],
-    "package_manager": "npm",
-    "runtime": "node",
+    "package_manager": "[DETECTED_PACKAGE_MANAGER]",
+    "runtime": "[DETECTED_RUNTIME]",
     "monorepo": true,
     "app_surfaces": ["web", "mobile", "api"]
   },
@@ -94,28 +94,28 @@
     "local_commands": [
       {
         "name": "typecheck",
-        "command": "npm run typecheck",
-        "source": "package_json"
+        "command": "[DETECTED_TYPECHECK_COMMAND]",
+        "source": "ci_workflow"
       },
       {
         "name": "lint",
-        "command": "npm run lint",
-        "source": "package_json"
+        "command": "[DETECTED_LINT_COMMAND]",
+        "source": "ci_workflow"
       },
       {
         "name": "test",
-        "command": "npm test",
-        "source": "package_json"
+        "command": "[DETECTED_TEST_COMMAND]",
+        "source": "ci_workflow"
       },
       {
         "name": "build",
-        "command": "npm run build",
-        "source": "package_json"
+        "command": "[DETECTED_BUILD_COMMAND]",
+        "source": "ci_workflow"
       },
       {
         "name": "verify",
-        "command": "npm run verify",
-        "source": "package_json"
+        "command": "[DETECTED_VERIFY_COMMAND]",
+        "source": "ci_workflow"
       }
     ],
     "ci_workflows": [

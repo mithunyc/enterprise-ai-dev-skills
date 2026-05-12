@@ -103,16 +103,17 @@ When build, tests, or lint fail:
 The `.buildloop.yml` must mirror the existing CI, not replace it:
 
 ```yaml
-# DO: mirror what CI already does
+# DO: mirror what CI already does. Do not assume npm, pnpm, yarn, cargo,
+# go, make, or any other tool until the repo proves it through files or CI.
 commands:
-  lint: "npm run lint"        # same command as .github/workflows/ci.yml
-  typecheck: "npm run typecheck"
-  test: "npm test"
-  build: "npm run build"
+  lint: "[DETECTED_LINT_COMMAND]"          # same command as existing CI
+  typecheck: "[DETECTED_TYPECHECK_COMMAND]"
+  test: "[DETECTED_TEST_COMMAND]"
+  build: "[DETECTED_BUILD_COMMAND]"
 
 # DON'T: invent commands that aren't in CI
 # commands:
-#   lint: "eslint ."          # different from "npm run lint" — parity gap
+#   lint: "[NEW_LINT_COMMAND]"             # different from existing CI — parity gap
 ```
 
 If the project uses a Makefile, use `make` targets:

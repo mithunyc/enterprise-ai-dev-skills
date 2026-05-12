@@ -2,7 +2,7 @@
 # [CUSTOMIZE] Replace values in this block for your project.
 project: "[YOUR_PROJECT_NAME]"
 stack: "[YOUR_FRAMEWORK] + [YOUR_RUNTIME]"
-package_manager: "[YOUR_PACKAGE_MANAGER]"  # e.g. npm | yarn | cargo | go mod
+package_manager: "[YOUR_PACKAGE_MANAGER]"  # e.g. npm | pnpm | yarn | bun | cargo | go mod
 test_runner: "[YOUR_TEST_RUNNER]"           # e.g. jest | vitest | pytest | go test
 lint_command: "[YOUR_LINT_COMMAND]"         # e.g. eslint . | ruff check .
 typecheck_command: "[YOUR_TYPECHECK_COMMAND]" # e.g. tsc --noEmit | n/a
@@ -280,8 +280,9 @@ Session start MUST read:
 
 **Required session commands:**
 ```bash
-# [CUSTOMIZE] Adapt these to your project's actual commands
-[YOUR_PACKAGE_MANAGER] install    # verify deps
+# [CUSTOMIZE] Adapt these to your project's discovered commands.
+# Do not assume npm, pnpm, yarn, bun, cargo, go, make, or any other tool.
+[YOUR_INSTALL_COMMAND]            # verify deps if the ecosystem has an install step
 [YOUR_LINT_COMMAND]               # verify lint
 [YOUR_TYPECHECK_COMMAND]          # verify types
 git status
