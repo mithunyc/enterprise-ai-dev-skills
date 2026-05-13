@@ -10,3 +10,4 @@ tasks/
 scratch/
 .buildloop/
 .buildloop-runs/
+.graphify/
