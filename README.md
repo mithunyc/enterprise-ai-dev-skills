@@ -2,11 +2,11 @@
 
 [![CI](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml/badge.svg)](https://github.com/mithunyc/buildloop/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v2.0.7-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.0.7)
+[![Version](https://img.shields.io/badge/version-v2.1.0-green.svg)](https://github.com/mithunyc/buildloop/releases/tag/v2.1.0)
 
 **Spec-to-production control plane for AI-assisted software delivery.**
 
-Curated skills, templates, schemas, and gate scripts that give AI coding agents (Codex, Claude Code, Cursor, Antigravity) enterprise-grade planning, verification, security, and release discipline — on any stack.
+Curated skills, templates, schemas, supervised CLI tools, gate scripts, and sandbox controls that give AI coding agents (Codex, Claude Code, Cursor, Antigravity) enterprise-grade planning, verification, security, and release discipline on any stack.
 
 ---
 
@@ -184,15 +184,15 @@ Deterministic gates with an independent witness. No self-grading.
 ## What's in the Repo
 
 ```
-skills/             Local skills installed directly (enterprise-ai-dev, awesome-design-md, …)
+skills/             Local skills installed directly (enterprise-ai-dev, awesome-design-md, ...)
 commands/           Claude Code slash command aliases for /orchestrator and /buildloop
 templates/          Reusable governance artifacts (PRD, slice contracts, receipts, AGENTS template)
 schemas/            JSON schemas validating all frontmatter and YAML contracts
-reference/          Deep-reference docs for the lifecycle (phase engine, security triggers, …)
+reference/          Deep-reference docs for lifecycle, advisory bridges, and sandbox security
 playbooks/          System optimization and skill acquisition playbooks
-scripts/            gate-runner.mjs, validate-manifest.mjs, audit-upstream.mjs, installers
+scripts/            buildloop.mjs, detect-capabilities.mjs, gate-runner.mjs, sandbox-run.mjs, validators, installers
 examples/           Working greenfield and brownfield fixture walkthroughs
-tests/              install.test.mjs — validates the whole distribution on every CI run
+tests/              install, capability, CLI, and sandbox tests run in CI
 curated-skills.json Upstream skill registry with pinned commit SHAs
 ```
 
@@ -204,6 +204,10 @@ curated-skills.json Upstream skill registry with pinned commit SHAs
 - **Templates** — PRD, slice contracts, evidence receipts, adversarial review, diagnostic baseline, handoff, AGENTS.md template.
 - **Schemas** — JSON Schema draft-07 validation for all frontmatter contracts.
 - **Gate runner** — reads `.buildloop.yml`, executes quality gates, writes `gate-results.json` as independent witness.
+- **Capability detection** - `detect-capabilities.mjs` reports package manager, CI, Docker, Graphify, Obsidian, and Buildloop readiness without writing unless `--write` is used.
+- **Supervised CLI** - `buildloop.mjs` exposes read-only `capabilities`, `doctor`, `manifest`, `gates`, and `review` commands. No deploy, no auto-fix, no overnight autonomy.
+- **Advisory bridges** - Obsidian and Graphify references define read-only/advisory integration boundaries; no runtime bridge writes are implemented.
+- **Docker sandbox foundation** - `sandbox-run.mjs` provides dry-run-first Docker command planning, blocked secret mounts, offline default networking, scoped logs, and mocked CI tests.
 - **Brownfield bootstrap compiler** — `orchestrator-manifest.json` schema for machine-readable repo governance.
 - **Supply chain pinning** — upstream skills pinned to full SHA commits in `curated-skills.json`.
 - **CI** — validates templates, schemas, and scripts on every push.

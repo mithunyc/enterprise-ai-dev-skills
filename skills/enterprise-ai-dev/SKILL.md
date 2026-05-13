@@ -9,8 +9,9 @@ description: >
   refactor, launch, review, harden, or operate software — especially when the
   request involves: enterprise-grade, production-ready, brownfield project,
   new project, PRD, architecture, TDD, QA, security, deployment, or release.
-  Automatically selects GREENFIELD, BROWNFIELD, GOVERNED, REVIEW_ONLY, or
-  AUTONOMOUS profile.
+  Automatically selects GREENFIELD, BROWNFIELD, GOVERNED, REVIEW_ONLY,
+  RELEASE, or AUTONOMOUS_LOOP profile. Uses Buildloop runtime tools only when
+  they are present in the current repo.
 ---
 
 # Enterprise AI Dev — Spec-to-Production Control Plane
@@ -46,6 +47,25 @@ Project-local governance always overrides these global fallback rules.
 
 ---
 
+## Optional Buildloop Runtime Tools
+
+Use these only when they exist in the current repo. Do not invent them, install Docker, or assume they are available.
+
+| Tool | When To Use | Boundary |
+|------|-------------|----------|
+| `node scripts/detect-capabilities.mjs` | Read-only capability scan during Step 0 / Step 1A | Writes only with explicit `--write` |
+| `node scripts/buildloop.mjs doctor` | Human-readable repo readiness report | Supervised/read-only |
+| `node scripts/buildloop.mjs gates` | Run `.buildloop.yml` gates | Uses project-defined commands |
+| `node scripts/buildloop.mjs review` | Review latest `gate-results.json` | Reads evidence; does not self-grade |
+| `node scripts/sandbox-run.mjs --dry-run` | Inspect Docker sandbox plan for untrusted commands | Dry-run by default |
+| `node scripts/sandbox-run.mjs --execute` | Run a sandboxed command only after explicit approval | Docker required; no secrets; offline network default |
+
+Obsidian and Graphify context is advisory-only. Read only explicit configured paths, respect token budgets, never auto-promote lessons, and never write bridge output unless a future approved phase explicitly changes that contract.
+
+L4/overnight autonomy is not enabled by this skill. Any L4+ action requires a separate threat model, explicit human approval, and verified sandbox evidence.
+
+---
+
 ## Step 0: Classify and Select Profile
 
 Before anything else, classify the project:
@@ -59,6 +79,8 @@ Before anything else, classify the project:
 | User asks for analysis, not code changes | REVIEW_ONLY |
 | User asks to ship, deploy, or prepare release | RELEASE |
 | Steps 0–8 already approved, looping on stories | AUTONOMOUS_LOOP |
+
+If Buildloop runtime tools are present, prefer `buildloop doctor` or `detect-capabilities.mjs` as supporting evidence for classification. If they are absent, continue with normal repo inspection.
 
 ---
 
@@ -135,6 +157,8 @@ Loop: `9 (TDD) → 10 (self-review) → 11 (gates) → 12 (AI review) → receip
 
 Autonomous mode reads `.buildloop.yml` for commands and `protected_paths`. If stuck (3+ consecutive failures): emit STUCK signal, escalate to human.
 
+Autonomous loop is still supervised slice execution. It is not L4 overnight autonomy and must not run deploy, auto-fix, credential, migration, or production actions without explicit human approval.
+
 ---
 
 ## Risk-Scaled Grill-Me Probes
@@ -182,6 +206,8 @@ protected_paths:
 ```
 
 Gate-runner produces `gate-results.json`. Evidence receipt references it. Gate-runner is the independent witness — the agent does not self-grade.
+
+If `scripts/buildloop.mjs` is present, use `node scripts/buildloop.mjs gates` and `node scripts/buildloop.mjs review` as the preferred supervised wrapper. If it is absent, run the repo's native checks directly and label any missing gate witness as UNVERIFIED.
 
 ---
 
@@ -260,5 +286,6 @@ Pause and ask before:
 - Making irreversible architecture choices when requirement is unclear
 - Proceeding when tests cannot run and change is high-risk
 - Taking any action at L4+ autonomy level without explicit opt-in
+- Running `sandbox-run --execute`, full network mode, deploys, migrations, or production-impacting commands without explicit human approval
 - About to guess architecture instead of inspecting repo truth
 - Gate/test/build failure persists after 3 fix attempts — halt and report
