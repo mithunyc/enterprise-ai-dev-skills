@@ -39,14 +39,14 @@
       "default": false
     },
     "mounts": {
-      "description": "Additional bind mounts. Subject to security validation — secret paths always blocked.",
+      "description": "Additional bind mounts. Subject to security validation - secret paths always blocked.",
       "type": "array",
       "items": {
         "type": "object",
         "required": ["host_path", "container_path"],
         "properties": {
           "host_path": { "type": "string" },
-          "container_path": { "type": "string" },
+          "container_path": { "type": "string", "pattern": "^/" },
           "readonly": { "type": "boolean", "default": false }
         },
         "additionalProperties": false
@@ -61,7 +61,7 @@
         "required": ["name", "container_path"],
         "properties": {
           "name": { "type": "string" },
-          "container_path": { "type": "string" }
+          "container_path": { "type": "string", "pattern": "^/" }
         },
         "additionalProperties": false
       },
@@ -82,6 +82,11 @@
     "env": {
       "description": "Environment variables for the container. Must not include secrets.",
       "type": "object",
+      "propertyNames": {
+        "not": {
+          "pattern": "(SECRET|TOKEN|PASSWORD|CREDENTIAL|PRIVATE_KEY|API_KEY|ACCESS_KEY|AWS_|GITHUB_TOKEN|OPENAI_API_KEY|ANTHROPIC_API_KEY)"
+        }
+      },
       "additionalProperties": { "type": "string" },
       "default": {}
     }

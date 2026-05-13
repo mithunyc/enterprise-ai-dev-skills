@@ -264,7 +264,7 @@ check('13. /var/run/docker.sock mount blocked', () => {
 
 check('14. path traversal blocked', () => {
   const projectCwd = '/home/user/project';
-  const cases = ['../../etc/passwd', '../../../root', '../../.ssh/id_rsa'];
+  const cases = ['../../etc/passwd', '../../../root', '../../.ssh/id_rsa', '../project-evil/file'];
   for (const p of cases) {
     const result = checkPathTraversal(p, projectCwd);
     assert.equal(result.safe, false, `Expected ${p} to be blocked as traversal`);
@@ -292,6 +292,42 @@ check('15. logs resolve only under .buildloop-runs/', () => {
 
   const escape = validateLogDir('../other-project/logs', cwd);
   assert.equal(escape.valid, false, 'Expected traversal log dir to be rejected');
+
+  const prefixEscape = validateLogDir('.buildloop-runs-evil', cwd);
+  assert.equal(prefixEscape.valid, false, 'Expected .buildloop-runs-evil prefix trick to be rejected');
+});
+
+// ---------------------------------------------------------------------------
+// Test 15b: Absolute mounts must stay under project root
+// ---------------------------------------------------------------------------
+
+check('15b. absolute bind mounts outside project root are blocked', () => {
+  const config = {
+    command: ['echo', 'ok'],
+    mounts: [{ host_path: '/home/user/other/file.txt', container_path: '/mnt/file.txt', readonly: true }],
+  };
+  const plan = buildDockerCommand(config, '/home/user/project');
+  assert.ok(plan.errors.some(e => e.includes('Path escapes project directory')), `Expected escape error: ${plan.errors.join(', ')}`);
+
+  const valid = {
+    command: ['echo', 'ok'],
+    mounts: [{ host_path: '/home/user/project/fixtures/file.txt', container_path: '/mnt/file.txt', readonly: true }],
+  };
+  const validPlan = buildDockerCommand(valid, '/home/user/project');
+  assert.equal(validPlan.errors.length, 0, `Expected in-project absolute mount to pass: ${validPlan.errors.join(', ')}`);
+});
+
+// ---------------------------------------------------------------------------
+// Test 15c: Secret-looking env keys are blocked
+// ---------------------------------------------------------------------------
+
+check('15c. secret-looking env keys are blocked', () => {
+  const result = validateConfig({ command: ['echo'], env: { OPENAI_API_KEY: 'sk-test' } });
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some(e => e.includes('looks secret-bearing')));
+
+  const safe = validateConfig({ command: ['echo'], env: { NODE_ENV: 'test' } });
+  assert.equal(safe.valid, true, `Expected safe env to pass: ${safe.errors.join(', ')}`);
 });
 
 // ---------------------------------------------------------------------------
@@ -354,7 +390,7 @@ check('19. no shell interpolation by default', () => {
 check('20. exported functions do not call process.exit()', () => {
   const source = readFileSync(join(ROOT, 'scripts', 'sandbox-run.mjs'), 'utf8');
 
-  // Extract exported function bodies — they should not contain process.exit
+  // Extract exported function bodies - they should not contain process.exit
   // The CLI wrapper (cli function) IS allowed to set process.exitCode, but
   // exported functions must not call process.exit().
   const exportedFns = [
@@ -416,6 +452,33 @@ check('bonus: checkDockerAvailable with mock', () => {
   assert.equal(unavailable.available, false);
   assert.equal(unavailable.version, null);
   assert.ok(unavailable.error.length > 0);
+});
+
+// ---------------------------------------------------------------------------
+// Bonus: real execution passes configured timeout and reports spawn errors
+// ---------------------------------------------------------------------------
+
+check('bonus: runSandbox enforces timeout and reports spawn errors', () => {
+  const calls = [];
+  const exec = (cmd, args, opts) => {
+    calls.push({ cmd, args, opts });
+    if (args[0] === '--version') {
+      return { status: 0, stdout: 'Docker version 24.0.7, build abc', stderr: '', error: null };
+    }
+    return { status: null, stdout: '', stderr: '', error: new Error('spawn failed') };
+  };
+
+  const result = runSandbox({ command: ['npm', 'test'], timeout_seconds: 7 }, {
+    cwd: ROOT,
+    dryRun: false,
+    exec,
+  });
+
+  assert.equal(result.success, false);
+  assert.ok(result.errors.some(e => e.includes('spawn failed')), `Expected spawn error: ${result.errors.join(', ')}`);
+  const runCall = calls.find(call => call.args[0] === 'run');
+  assert.ok(runCall, 'Expected docker run call');
+  assert.equal(runCall.opts.timeout, 7000);
 });
 
 // ---------------------------------------------------------------------------

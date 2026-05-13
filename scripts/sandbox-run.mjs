@@ -20,13 +20,13 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join, normalize, resolve, sep } from 'node:path';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, join, normalize, resolve, sep } from 'node:path';
 import { homedir, platform } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 // ---------------------------------------------------------------------------
-// Blocked mount patterns — security contract
+// Blocked mount patterns - security contract
 // ---------------------------------------------------------------------------
 
 const BLOCKED_MOUNT_PATTERNS = [
@@ -42,6 +42,7 @@ const BLOCKED_MOUNT_PATTERNS = [
 ];
 
 const HOME_SECRET_DIRS = ['.ssh', '.aws', '.config'];
+const BLOCKED_ENV_KEY_PATTERN = /(?:SECRET|TOKEN|PASSWORD|CREDENTIAL|PRIVATE_KEY|API_KEY|ACCESS_KEY|AWS_|GITHUB_TOKEN|OPENAI_API_KEY|ANTHROPIC_API_KEY)/i;
 
 // ---------------------------------------------------------------------------
 // Schema loading
@@ -123,8 +124,76 @@ export function validateConfig(config) {
 
   // timeout_seconds range
   if (config.timeout_seconds !== undefined) {
-    if (typeof config.timeout_seconds !== 'number' || config.timeout_seconds < 1 || config.timeout_seconds > 28800) {
+    if (!Number.isInteger(config.timeout_seconds) || config.timeout_seconds < 1 || config.timeout_seconds > 28800) {
       errors.push('timeout_seconds must be an integer between 1 and 28800.');
+    }
+  }
+
+  if (config.mounts !== undefined) {
+    if (!Array.isArray(config.mounts)) {
+      errors.push('mounts must be an array.');
+    } else {
+      for (let i = 0; i < config.mounts.length; i++) {
+        const mount = config.mounts[i];
+        if (!mount || typeof mount !== 'object' || Array.isArray(mount)) {
+          errors.push(`mounts[${i}] must be an object.`);
+          continue;
+        }
+        for (const key of Object.keys(mount)) {
+          if (!['host_path', 'container_path', 'readonly'].includes(key)) {
+            errors.push(`mounts[${i}] unknown property: "${key}".`);
+          }
+        }
+        if (typeof mount.host_path !== 'string' || mount.host_path.length === 0) {
+          errors.push(`mounts[${i}].host_path must be a non-empty string.`);
+        }
+        if (typeof mount.container_path !== 'string' || !mount.container_path.startsWith('/')) {
+          errors.push(`mounts[${i}].container_path must be an absolute container path.`);
+        }
+        if (mount.readonly !== undefined && typeof mount.readonly !== 'boolean') {
+          errors.push(`mounts[${i}].readonly must be a boolean.`);
+        }
+      }
+    }
+  }
+
+  if (config.cache_mounts !== undefined) {
+    if (!Array.isArray(config.cache_mounts)) {
+      errors.push('cache_mounts must be an array.');
+    } else {
+      for (let i = 0; i < config.cache_mounts.length; i++) {
+        const cache = config.cache_mounts[i];
+        if (!cache || typeof cache !== 'object' || Array.isArray(cache)) {
+          errors.push(`cache_mounts[${i}] must be an object.`);
+          continue;
+        }
+        for (const key of Object.keys(cache)) {
+          if (!['name', 'container_path'].includes(key)) {
+            errors.push(`cache_mounts[${i}] unknown property: "${key}".`);
+          }
+        }
+        if (typeof cache.name !== 'string' || cache.name.length === 0) {
+          errors.push(`cache_mounts[${i}].name must be a non-empty string.`);
+        }
+        if (typeof cache.container_path !== 'string' || !cache.container_path.startsWith('/')) {
+          errors.push(`cache_mounts[${i}].container_path must be an absolute container path.`);
+        }
+      }
+    }
+  }
+
+  if (config.env !== undefined) {
+    if (!config.env || typeof config.env !== 'object' || Array.isArray(config.env)) {
+      errors.push('env must be an object.');
+    } else {
+      for (const [key, value] of Object.entries(config.env)) {
+        if (BLOCKED_ENV_KEY_PATTERN.test(key)) {
+          errors.push(`env key "${key}" looks secret-bearing and is blocked.`);
+        }
+        if (typeof value !== 'string') {
+          errors.push(`env.${key} must be a string.`);
+        }
+      }
     }
   }
 
@@ -134,6 +203,21 @@ export function validateConfig(config) {
 // ---------------------------------------------------------------------------
 // Path security
 // ---------------------------------------------------------------------------
+
+function normalizeForBoundary(p) {
+  const normalized = normalize(p);
+  return platform() === 'win32' ? normalized.toLowerCase() : normalized;
+}
+
+function isSameOrInside(parentPath, targetPath) {
+  const parent = normalizeForBoundary(parentPath);
+  const target = normalizeForBoundary(targetPath);
+  if (target === parent) {
+    return true;
+  }
+  const parentWithSep = parent.endsWith(sep) ? parent : `${parent}${sep}`;
+  return target.startsWith(parentWithSep);
+}
 
 /**
  * Check if a host path is a blocked secret path.
@@ -184,7 +268,7 @@ export function checkPathTraversal(targetPath, projectCwd) {
   const resolvedTarget = resolve(projectCwd, targetPath);
   const normalizedTarget = normalize(resolvedTarget);
 
-  if (!normalizedTarget.startsWith(resolvedCwd)) {
+  if (!isSameOrInside(resolvedCwd, normalizedTarget)) {
     return {
       safe: false,
       resolved: normalizedTarget,
@@ -207,7 +291,7 @@ export function validateLogDir(logDir, projectCwd) {
 
   // Must contain .buildloop-runs in the path
   const runsDir = join(resolvedCwd, '.buildloop-runs');
-  if (!resolvedLog.startsWith(runsDir)) {
+  if (!isSameOrInside(runsDir, resolvedLog)) {
     return {
       valid: false,
       resolved: resolvedLog,
@@ -297,7 +381,7 @@ export function checkDockerAvailable(options = {}) {
 
 /**
  * Build the Docker run command array from a validated config.
- * Does NOT execute Docker — returns the command plan.
+ * Does NOT execute Docker - returns the command plan.
  *
  * @param {object} config - Validated sandbox config
  * @param {string} projectCwd - Absolute path to project root
@@ -330,7 +414,7 @@ export function buildDockerCommand(config, projectCwd, options = {}) {
     warnings.push('Allowlist mode uses bridge network. DNS filtering is application-level.');
   } else if (mode === 'full') {
     warnings.push('WARNING: Full network mode enabled. Container has unrestricted network access.');
-    // Default bridge network — no flag needed
+    // Default bridge network - no flag needed
   }
 
   // Timeout
@@ -368,17 +452,13 @@ export function buildDockerCommand(config, projectCwd, options = {}) {
         continue;
       }
 
-      // Check path traversal for relative mounts
-      if (!mount.host_path.startsWith('/') && !/^[A-Za-z]:/.test(mount.host_path)) {
-        const traversal = checkPathTraversal(mount.host_path, projectCwd);
-        if (!traversal.safe) {
-          errors.push(traversal.reason);
-          continue;
-        }
+      const traversal = checkPathTraversal(mount.host_path, projectCwd);
+      if (!traversal.safe) {
+        errors.push(traversal.reason);
+        continue;
       }
 
-      const hostResolved = resolve(projectCwd, mount.host_path);
-      const translatedHost = translatePath(hostResolved);
+      const translatedHost = translatePath(traversal.resolved);
       const mountFlag = mount.readonly ? ':ro' : '';
       args.push('-v', `${translatedHost}:${mount.container_path}${mountFlag}`);
     }
@@ -401,7 +481,7 @@ export function buildDockerCommand(config, projectCwd, options = {}) {
   // Image
   args.push(image);
 
-  // Command — array form, no shell interpolation
+  // Command - array form, no shell interpolation
   if (Array.isArray(config.command)) {
     args.push(...config.command);
   }
@@ -500,14 +580,25 @@ export function runSandbox(config, options = {}) {
   try {
     mkdirSync(resolvedLogDir, { recursive: true });
   } catch {
-    // Best effort — log dir may already exist
+    // Best effort - log dir may already exist
   }
 
   // Execute
-  const result = exec('docker', plan.args, { cwd });
+  const timeoutMs = (config.timeout_seconds || 300) * 1000;
+  const result = exec('docker', plan.args, { cwd, timeout: timeoutMs });
   const stdout = (result.stdout || '').trim();
   const stderr = (result.stderr || '').trim();
   const output = [stdout, stderr].filter(Boolean).join('\n');
+
+  if (result.error) {
+    return {
+      success: false,
+      dryRun: false,
+      plan,
+      output,
+      errors: [`Docker execution failed: ${result.error.message || result.error}`],
+    };
+  }
 
   // Write log
   const logFile = join(resolvedLogDir, `sandbox-${Date.now()}.log`);
@@ -544,7 +635,7 @@ export function runSandbox(config, options = {}) {
 
 function printHelp() {
   console.log([
-    'sandbox-run — Buildloop Docker sandbox runner',
+    'sandbox-run - Buildloop Docker sandbox runner',
     '',
     'Usage:',
     '  node scripts/sandbox-run.mjs --help',
@@ -638,7 +729,7 @@ function cli() {
     console.log(`  ${result.output}`);
     if (result.plan && result.plan.warnings.length > 0) {
       for (const w of result.plan.warnings) {
-        console.log(`  ⚠ ${w}`);
+        console.log(`  WARNING: ${w}`);
       }
     }
     return;
@@ -647,7 +738,7 @@ function cli() {
   // Real execution
   if (result.plan && result.plan.warnings.length > 0) {
     for (const w of result.plan.warnings) {
-      console.error(`⚠ ${w}`);
+      console.error(`WARNING: ${w}`);
     }
   }
 
