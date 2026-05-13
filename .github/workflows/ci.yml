@@ -215,3 +215,6 @@ jobs:
 
       - name: Run upstream pin audit
         run: node scripts/audit-upstream.mjs
+
+      - name: Run capabilities test suite
+        run: node tests/capabilities.test.mjs

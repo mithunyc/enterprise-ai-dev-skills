@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BuildloopCapabilities",
+  "type": "object",
+  "required": ["schema_version", "detected_at", "environment", "git", "docker", "graphify", "obsidian", "buildloop"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "detected_at": { "type": "string", "format": "date-time" },
+    "environment": {
+      "type": "object",
+      "required": ["node_version", "os"],
+      "properties": {
+        "node_version": { "type": "string" },
+        "package_manager": { "type": "string", "enum": ["npm","pnpm","yarn","bun","pip","cargo","go","make","none","unknown"] },
+        "os": { "type": "string", "enum": ["windows","darwin","linux","unknown"] },
+        "shell": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "git": {
+      "type": "object",
+      "required": ["available"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "branch": { "type": ["string","null"] },
+        "clean": { "type": ["boolean","null"] },
+        "has_remote": { "type": ["boolean","null"] }
+      },
+      "additionalProperties": false
+    },
+    "docker": {
+      "type": "object",
+      "required": ["available"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "version": { "type": ["string","null"] }
+      },
+      "additionalProperties": false
+    },
+    "graphify": {
+      "type": "object",
+      "required": ["available"],
+      "properties": {
+        "available": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "obsidian": {
+      "type": "object",
+      "required": ["configured"],
+      "properties": {
+        "configured": { "type": "boolean" },
+        "vault_path": { "type": ["string","null"] }
+      },
+      "additionalProperties": false
+    },
+    "buildloop": {
+      "type": "object",
+      "required": ["yml_present", "manifest_present", "gate_runner_available"],
+      "properties": {
+        "yml_present": { "type": "boolean" },
+        "manifest_present": { "type": "boolean" },
+        "ci_workflows": { "type": "array", "items": { "type": "string" } },
+        "gate_runner_available": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "recommended_action": { "type": "string" }
+  },
+  "additionalProperties": false
+}

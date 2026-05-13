@@ -1,0 +1,20 @@
+# .buildloop.yml — Brownfield Broken Build Fixture
+#
+# This example has an intentionally broken test command to demonstrate
+# the diagnostic baseline workflow. The gate-runner will report FAIL
+# for the test gate, triggering a stabilization-first workflow.
+
+adoption_mode: brownfield
+risk_level: medium
+
+commands:
+  lint: "n/a"
+  typecheck: "n/a"
+  test: "node test.mjs"
+  build: "n/a"
+
+protected_paths:
+  - ".env*"
+  - "**/*.key"
+  - "**/*.pem"
+  - ".github/workflows/**"

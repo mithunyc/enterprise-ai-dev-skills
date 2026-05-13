@@ -1,0 +1,18 @@
+# .buildloop.yml — Greenfield Empty Project
+#
+# Minimal config for a brand-new repo with no code yet.
+# Replace commands as you add tooling.
+
+adoption_mode: greenfield
+risk_level: low
+
+commands:
+  lint: "n/a"
+  typecheck: "n/a"
+  test: "n/a"
+  build: "n/a"
+
+protected_paths:
+  - ".env*"
+  - "**/*.key"
+  - "**/*.pem"
