@@ -218,3 +218,6 @@ jobs:
 
       - name: Run capabilities test suite
         run: node tests/capabilities.test.mjs
+
+      - name: Run CLI test suite
+        run: node tests/buildloop-cli.test.mjs
