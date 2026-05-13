@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BuildloopSandboxConfig",
+  "description": "Configuration for the Buildloop Docker sandbox runner.",
+  "type": "object",
+  "required": ["command"],
+  "properties": {
+    "command": {
+      "description": "Command and arguments to execute inside the sandbox. Array form prevents shell interpolation.",
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "cwd": {
+      "description": "Working directory. Resolved relative to project root. Must not escape project directory.",
+      "type": "string",
+      "default": "."
+    },
+    "image": {
+      "description": "Docker image for the sandbox container.",
+      "type": "string",
+      "default": "node:22-slim"
+    },
+    "network_mode": {
+      "description": "Network isolation: offline (default, no network), allowlist (DNS allowlist), full (requires approval).",
+      "type": "string",
+      "enum": ["offline", "allowlist", "full"],
+      "default": "offline"
+    },
+    "network_allowlist": {
+      "description": "DNS names allowed when network_mode is allowlist. Required for allowlist mode.",
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "full_network_approved": {
+      "description": "Explicit approval flag required when network_mode is full.",
+      "type": "boolean",
+      "default": false
+    },
+    "mounts": {
+      "description": "Additional bind mounts. Subject to security validation — secret paths always blocked.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["host_path", "container_path"],
+        "properties": {
+          "host_path": { "type": "string" },
+          "container_path": { "type": "string" },
+          "readonly": { "type": "boolean", "default": false }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "cache_mounts": {
+      "description": "Named Docker volumes for dependency caches.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "container_path"],
+        "properties": {
+          "name": { "type": "string" },
+          "container_path": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "timeout_seconds": {
+      "description": "Maximum execution time in seconds.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 28800,
+      "default": 300
+    },
+    "log_dir": {
+      "description": "Log directory. Must resolve under .buildloop-runs/.",
+      "type": "string",
+      "default": ".buildloop-runs"
+    },
+    "env": {
+      "description": "Environment variables for the container. Must not include secrets.",
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "default": {}
+    }
+  },
+  "additionalProperties": false
+}
