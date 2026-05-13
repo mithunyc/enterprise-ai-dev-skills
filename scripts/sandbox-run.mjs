@@ -324,7 +324,7 @@ export function normalizeWindowsPath(p) {
 
 /**
  * Translate a Windows host path to a WSL-compatible path for Docker mounts.
- * E.g., C:\Users\foo\project -> /mnt/c/Users/foo/project
+ * E.g., C:\repo\project -> /mnt/c/repo/project
  * @param {string} windowsPath - The Windows path
  * @returns {string} WSL-compatible path
  */

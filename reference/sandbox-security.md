@@ -109,7 +109,7 @@ Windows paths are normalized for Docker compatibility:
 ### WSL Path Translation
 
 When running Docker via WSL, Windows paths are translated:
-- `C:\Users\foo\project` → `/mnt/c/Users/foo/project`
+- `C:\repo\project` -> `/mnt/c/repo/project`
 
 Path translation is deterministic and tested with mocked inputs.
 

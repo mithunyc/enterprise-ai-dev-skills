@@ -221,10 +221,10 @@ check('9. .env* mount blocked', () => {
 // ---------------------------------------------------------------------------
 
 check('10. ~/.ssh mount blocked', () => {
-  const result = checkMountSecurity('/home/user/.ssh', '/home/user');
+  const result = checkMountSecurity('/repo/profile/.ssh', '/repo/profile');
   assert.equal(result.blocked, true, 'Expected ~/.ssh to be blocked');
 
-  const result2 = checkMountSecurity('/home/user/.ssh/id_rsa', '/home/user');
+  const result2 = checkMountSecurity('/repo/profile/.ssh/id_rsa', '/repo/profile');
   assert.equal(result2.blocked, true, 'Expected ~/.ssh/id_rsa to be blocked');
 });
 
@@ -233,10 +233,10 @@ check('10. ~/.ssh mount blocked', () => {
 // ---------------------------------------------------------------------------
 
 check('11. ~/.aws mount blocked', () => {
-  const result = checkMountSecurity('/home/user/.aws', '/home/user');
+  const result = checkMountSecurity('/repo/profile/.aws', '/repo/profile');
   assert.equal(result.blocked, true, 'Expected ~/.aws to be blocked');
 
-  const result2 = checkMountSecurity('/home/user/.aws/credentials', '/home/user');
+  const result2 = checkMountSecurity('/repo/profile/.aws/credentials', '/repo/profile');
   assert.equal(result2.blocked, true, 'Expected ~/.aws/credentials to be blocked');
 });
 
@@ -245,7 +245,7 @@ check('11. ~/.aws mount blocked', () => {
 // ---------------------------------------------------------------------------
 
 check('12. ~/.config mount blocked', () => {
-  const result = checkMountSecurity('/home/user/.config', '/home/user');
+  const result = checkMountSecurity('/repo/profile/.config', '/repo/profile');
   assert.equal(result.blocked, true, 'Expected ~/.config to be blocked');
 });
 
@@ -263,7 +263,7 @@ check('13. /var/run/docker.sock mount blocked', () => {
 // ---------------------------------------------------------------------------
 
 check('14. path traversal blocked', () => {
-  const projectCwd = '/home/user/project';
+  const projectCwd = '/repo/project';
   const cases = ['../../etc/passwd', '../../../root', '../../.ssh/id_rsa', '../project-evil/file'];
   for (const p of cases) {
     const result = checkPathTraversal(p, projectCwd);
@@ -280,7 +280,7 @@ check('14. path traversal blocked', () => {
 // ---------------------------------------------------------------------------
 
 check('15. logs resolve only under .buildloop-runs/', () => {
-  const cwd = '/home/user/project';
+  const cwd = '/repo/project';
   const valid = validateLogDir('.buildloop-runs', cwd);
   assert.equal(valid.valid, true, `Expected .buildloop-runs to be valid: ${valid.reason}`);
 
@@ -304,16 +304,16 @@ check('15. logs resolve only under .buildloop-runs/', () => {
 check('15b. absolute bind mounts outside project root are blocked', () => {
   const config = {
     command: ['echo', 'ok'],
-    mounts: [{ host_path: '/home/user/other/file.txt', container_path: '/mnt/file.txt', readonly: true }],
+    mounts: [{ host_path: '/repo/other/file.txt', container_path: '/mnt/file.txt', readonly: true }],
   };
-  const plan = buildDockerCommand(config, '/home/user/project');
+  const plan = buildDockerCommand(config, '/repo/project');
   assert.ok(plan.errors.some(e => e.includes('Path escapes project directory')), `Expected escape error: ${plan.errors.join(', ')}`);
 
   const valid = {
     command: ['echo', 'ok'],
-    mounts: [{ host_path: '/home/user/project/fixtures/file.txt', container_path: '/mnt/file.txt', readonly: true }],
+    mounts: [{ host_path: '/repo/project/fixtures/file.txt', container_path: '/mnt/file.txt', readonly: true }],
   };
-  const validPlan = buildDockerCommand(valid, '/home/user/project');
+  const validPlan = buildDockerCommand(valid, '/repo/project');
   assert.equal(validPlan.errors.length, 0, `Expected in-project absolute mount to pass: ${validPlan.errors.join(', ')}`);
 });
 
@@ -335,7 +335,7 @@ check('15c. secret-looking env keys are blocked', () => {
 // ---------------------------------------------------------------------------
 
 check('16. Windows path normalization', () => {
-  assert.equal(normalizeWindowsPath('C:\\Users\\foo\\project'), 'c:/Users/foo/project');
+  assert.equal(normalizeWindowsPath('C:\\repo\\project'), 'c:/repo/project');
   assert.equal(normalizeWindowsPath('D:\\Work\\repo'), 'd:/Work/repo');
   assert.equal(normalizeWindowsPath('/unix/path'), '/unix/path');
   assert.equal(normalizeWindowsPath(''), '');
@@ -346,7 +346,7 @@ check('16. Windows path normalization', () => {
 // ---------------------------------------------------------------------------
 
 check('17. WSL path translation', () => {
-  assert.equal(windowsToWslPath('C:\\Users\\foo\\project'), '/mnt/c/Users/foo/project');
+  assert.equal(windowsToWslPath('C:\\repo\\project'), '/mnt/c/repo/project');
   assert.equal(windowsToWslPath('D:\\Work\\repo'), '/mnt/d/Work/repo');
   assert.equal(windowsToWslPath('/unix/path'), '/unix/path');
   assert.equal(windowsToWslPath(''), '');
